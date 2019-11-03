@@ -1,0 +1,40 @@
+#-*- coding:utf-8 -*-
+
+# __version__ = '0.0.1'
+# __maintainer__ = 'Niklas Wulff 2019-02-12'
+# __email__ = 'Niklas.Wulff@dlr.de'
+# __birthdate__ = '2019-02-12'
+# __status__ = 'dev'  # options are: dev, test, prod
+
+# This script is written to replace the excel tool VENCO (Vehicle ENergy COnsumption profiles)
+# by a more abstract and more powerful python version.
+
+##### Definition of parameters here?? ####
+#
+#from XX import YY as ZZ
+#from time import time
+#import xlrd as xlrd
+#import pandas as pd
+#import os
+#import configParser
+#
+####### file links and paths ###
+#
+
+linksRelative:
+    data: ./data/
+    plots: ./output/plots/
+    results: ./output/dailyTimeseries
+    scripts: ./scripts/
+    config: ./config/
+    tsConfig: ./config/timeseriesREMix.yaml
+
+linksAbsolute:
+    inputData: C:/Users/wulf_ni/Documents/01 Modellentwicklung/VencoPy/data/
+    REMixTimeseriesPath: C:/Users/wulf_ni/Documents/01 Modellentwicklung/VencoPy/output/annualTimeseries
+    OutputPath: C:/Users/wulf_ni/Documents/01 Modellentwicklung/VencoPy/output/dailyTimeseries
+
+files:
+    inputDataScalars: VencoPy_inputData2030_BEV-S.xlsx
+    inputDataDriveProfiles: VENCO_inputProfiles_Drive.csv
+    inputDataPlugProfiles: VENCO_inputProfiles_Plug.csv
