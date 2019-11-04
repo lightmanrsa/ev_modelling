@@ -30,9 +30,9 @@ linksRelative:
     tsConfig: ./config/timeseriesREMix.yaml
 
 linksAbsolute:
-    inputData: C:/Users/wulf_ni/Documents/01 Modellentwicklung/VencoPy/data/
-    REMixTimeseriesPath: C:/Users/wulf_ni/Documents/01 Modellentwicklung/VencoPy/output/annualTimeseries
-    OutputPath: C:/Users/wulf_ni/Documents/01 Modellentwicklung/VencoPy/output/dailyTimeseries
+    inputData: C:/vencopy_repo/inputData/
+    REMixTimeseriesPath: C:/vencopy_repo/output/annualTimeseries/
+    OutputPath: C:/vencopy_repo/output/dailyTimeseries/
 
 files:
     inputDataScalars: VencoPy_inputData2030_BEV-S.xlsx

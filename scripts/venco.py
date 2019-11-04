@@ -14,8 +14,6 @@ import sys
 
 sys.path.append(os.path.abspath('C:/REMix-OaM/OptiMo/projects/REMix-tools/remixPlotting'))
 
-from ioproc.tools import action
-from ioproc.logger import mainlogger, datalogger
 import numpy as np
 import yaml
 import pandas as pd
@@ -82,8 +80,8 @@ def readInputBoolean(file_link):
     return (df_out)
 
 
-@action('VencoPy')
-def readVencoInput(dmgr, config, params):
+# @action('VencoPy')
+def readVencoInput(linkConfig):
     '''
     Initializing action for VencoPy-specific config-file, link dictionary and data read-in. The config file has
     to be a dictionary in a .yaml file with the format
@@ -107,28 +105,28 @@ def readVencoInput(dmgr, config, params):
     '''
 
     # print(params['linkConfig'])
-    linkDict = initializeLinkMgr(readVencoConfig(params['linkConfig']))
+    linkDict = initializeLinkMgr(readVencoConfig(linkConfig))
+    # dmgr['linkDict'] = linkDict
 
-    #datalogger.info(linkDict)
+    print('Reading Venco input scalars, drive profiles and boolean plug profiles')
 
-    dmgr['linkDict'] = linkDict
-
-    mainlogger.debug('Reading Venco input scalars, drive profiles and boolean plug profiles')
     scalars = readInputScalar(linkDict['linkScalars'])
     driveProfiles_raw = readInputCSV(linkDict['linkDriveProfiles'])
     plugProfiles_raw = readInputBoolean(linkDict['linkPlugProfiles'])
 
-    mainlogger.info('There are ' + str(len(driveProfiles_raw)) + ' drive profiles and ' +
+    print('There are ' + str(len(driveProfiles_raw)) + ' drive profiles and ' +
                     str(len(driveProfiles_raw)) + ' plug profiles.')
-    mainlogger.info('writing scalars and profiles to data manager')
-    dmgr['scalars'] = scalars
-    dmgr['driveProfiles_raw'] = driveProfiles_raw
-    dmgr['plugProfiles_raw'] = plugProfiles_raw
+
+    return linkDict, scalars, driveProfiles_raw, plugProfiles_raw
+
+
+    # dmgr['scalars'] = scalars
+    # dmgr['driveProfiles_raw'] = driveProfiles_raw
+    # dmgr['plugProfiles_raw'] = plugProfiles_raw
+
 
 # -----PRE-PROCESSING---------------------------------
-
-
-@action('VencoPy')
+# @action('VencoPy')
 def procProfiles(dmgr, config, params):
     # ToDo: generalize more so any data format can be taken in not just CASEID, PKWID etc.
     '''
@@ -168,34 +166,42 @@ def procProfiles(dmgr, config, params):
     datalogger.debug(df_profiles)
 
 
-@action('VencoPy')
-def indexProfiles(dmgr, config, params):
+# @action('VencoPy')
+def indexProfile(driveProfile_raw, plugProfiles_raw, indices):
     '''
     Takes raw data as input and indices different profiles with the specified index columns und an unstacked form.
 
     :param profilesInput: The profiles that should be indexed.
     :param indices: Index columns that are assigned as indices.
-    :param profilesDmgr: Names by which the input profiles are written into the DataManager.
     :return: Indexed profiles are written to the DataManager under tha names specified by param profilesDmgr
     '''
-    ls_profiles = []
 
-    if len(params['profilesInput']) == len(params['profilesDmgr']):
-        for iprof in range(len(params['profilesInput'])):  # input profiles
-            profiles = dmgr[params['profilesInput'][iprof]].copy()
-            profiles_new = profiles.set_index(list(params['indices']))
-            profiles_new = profiles_new.set_index(profiles_new.groupby(level=0).cumcount(),
-                                                  append=True)
-            # profiles.index.names = params['indices']
-            dmgr[params['profilesDmgr'][iprof]] = profiles_new
-    else:
-        raise VencoError("The length of input profiles doesn't match the length of profile names for writing into the "
-                      "DataManager. Please check you parameters given in user.yaml")
-    datalogger.debug(profiles_new)
+    # for iprof in range(len(params['profilesInput'])):  # input profiles
+    #         profiles = dmgr[params['profilesInput'][iprof]].copy()
+    #         profiles_new = profiles.set_index(list(params['indices']))
+    #         profiles_new = profiles_new.set_index(profiles_new.groupby(level=0).cumcount(),
+    #                                               append=True)
+    #         # profiles.index.names = params['indices']
+    #         return(profiles_new)
+    #         dmgr[params['profilesDmgr'][iprof]] = profiles_new
+
+    driveProfile = driveProfile_raw.set_index(list(indices))
+#    driveProfile = driveProfile_raw.set_index(driveProfile.groupby(level=0).cumcount(),
+#                                          append=True)
+
+    plugProfile = plugProfiles_raw.set_index(list(indices))
+    # plugProfile = plugProfiles_raw.set_index(plugProfile.groupby(level=0).cumcount(),
+    #                                       append=True)
+
+    return (driveProfile, plugProfile)
+
+    # else:
+    #     raise VencoError("The length of input profiles doesn't match the length of profile names. "
+    #                      "Please check you parameters given in user.yaml")
 
 
-@action('VencoPy')
-def procScalars(dmgr, config, params):
+# @action('VencoPy')
+def procScalars(driveProfiles_raw, plugProfiles_raw, driveProfiles, plugProfiles):
     #ToDo: Other scalars derived from input??
     '''
     Calculates some scalars from the input data such as the number of hours of drive and plug profiles, the number of
@@ -204,32 +210,28 @@ def procScalars(dmgr, config, params):
     :return: Writes a dictionary to the DataManager under the key 'scalarsProc'
     '''
 
-    noHoursDrive = len(dmgr['driveProfiles'].columns)
-    noHoursPlug = len(dmgr['plugProfiles'].columns)
-    noDriveProfiles_in = len(dmgr['driveProfiles_raw'])
-    noPlugProfiles_in = len(dmgr['plugProfiles_raw'])
-    # dataColStart = 2  # make better!!
-    # dataColEnd = len(dmgr['driveProfiles_raw'].columns)
+    noHoursDrive = len(driveProfiles.columns)
+    noHoursPlug = len(plugProfiles.columns)
+    noDriveProfiles_in = len(driveProfiles_raw)
+    noPlugProfiles_in = len(plugProfiles_raw)
 
     scalarsProc = {'noHoursDrive': noHoursDrive,
                    'noHoursPlug': noHoursPlug,
                    'noDriveProfiles_in': noDriveProfiles_in,
                    'noPlugProfiles_in': noPlugProfiles_in}
-                   # 'dataColStart': dataColStart,
-                   # 'dataColEnd': dataColEnd}
 
     if noHoursDrive == noHoursPlug:
         scalarsProc['noHours'] = noHoursDrive
-    else:
-        datalogger.warn('Length of drive and plug input data differ! This will at the latest crash in calculating'
-                        'profiles for SoC max')
+    # else:
+        #datalogger.warn('Length of drive and plug input data differ! This will at the latest crash in calculating'
+        #                'profiles for SoC max')
 
-    dmgr['scalarsProc'] = scalarsProc
+    return(scalarsProc)
 
 # -----CALCULATION OF PROFILES-------------------------------------------------------
 
-@action('VencoPy')
-def calcConsumptionProfiles(dmgr, config, params):
+# @action('VencoPy')
+def calcConsumptionProfile(driveProfiles, scalars):
     '''
     Calculates electrical consumption profiles from drive profiles assuming specific consumption (in kWh/100 km)
     given in scalar input data file.
@@ -237,15 +239,13 @@ def calcConsumptionProfiles(dmgr, config, params):
     :return: Writes the calculated profiles to the DataManager under the key 'consumptionProfiles'
     '''
 
-    consumptionProfiles = dmgr['driveProfiles'].copy()
-    consumptionProfiles = consumptionProfiles * float(dmgr['scalars'].loc['Verbrauch NEFZ CD', 'value']) / 100
-
-    dmgr['consumptionProfiles'] = consumptionProfiles
-    # datalogger.info(consumptionProfiles)
+    consumptionProfiles = driveProfiles.copy()
+    consumptionProfiles = consumptionProfiles * float(scalars.loc['Verbrauch NEFZ CD', 'value']) / 100
+    return(consumptionProfiles)
 
 
-@action('VencoPy')
-def calcChargeProfile(dmgr, config, params):
+# @action('VencoPy')
+def calcChargeProfile(plugProfiles, scalars):
     '''
     Calculates the maximum possible charge power based on the plug profile assuming the charge column power
     given in the scalar input data file (so far under Panschluss).
@@ -253,15 +253,13 @@ def calcChargeProfile(dmgr, config, params):
     :return: Writes the resulting profiles to the DataManager under the key 'chargeProfiles'
     '''
 
-    chargeProfiles = dmgr['plugProfiles'].copy()
-    chargeProfiles = chargeProfiles * float(dmgr['scalars'].loc['Panschluss', 'value'])
-
-    dmgr['chargeProfiles'] = chargeProfiles
-    # datalogger.info(chargeProfiles)
+    chargeProfiles = plugProfiles.copy()
+    chargeProfiles = chargeProfiles * float(scalars.loc['Panschluss', 'value'])
+    return(chargeProfiles)
 
 
-@action('VencoPy')
-def calcChargeMaxProfiles(dmgr, config, params):
+# @action('VencoPy')
+def calcChargeMaxProfiles(chargeProfiles, scalars, nIter):
     '''
     Calculates all maximum SoC profiles under the assumption that batteries are always charged as soon as they
     are plugged to the grid. Values are assured to not fall below SoC_min * battery capacity or surpass
@@ -312,10 +310,9 @@ def calcChargeMaxProfiles(dmgr, config, params):
     # print(chargeMaxProfile.ix[0:20, :], flush=True)
     chargeMaxProfiles.drop(labels='newCharge', axis='columns', inplace=True)
     dmgr['chargeMaxProfiles'] = chargeMaxProfiles
-    # datalogger.info(chargeMaxProfiles)
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def calcChargeProfileUncontrolled(dmgr, config, params):
     '''
     Calculates the uncontrolled electric charging based on SoC Max profiles for each hour for each profile.
@@ -354,7 +351,7 @@ def calcChargeProfileUncontrolled(dmgr, config, params):
     # datalogger.info(chargeProfilesUncontrolled)
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def calcDriveProfilesFuelAux(dmgr, config, params):
 
     #ToDo: alternative vectorized format for looping over columns? numpy, pandas: broadcasting-rules
@@ -404,7 +401,7 @@ def calcDriveProfilesFuelAux(dmgr, config, params):
     # datalogger.info(driveProfilesFuelAux)
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def calcChargeMinProfiles(dmgr, config, params):
     '''
     Calculates minimum SoC profiles assuming that the hourly mileage has to exactly be fulfilled but no battery charge
@@ -469,7 +466,7 @@ def calcChargeMinProfiles(dmgr, config, params):
     # datalogger.info(chargeMinProfiles)
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def createRandNo(dmgr, config, params):
     '''
     Creates a random number between 0 and 1 for each profile based on driving profiles.
@@ -493,7 +490,7 @@ def createRandNo(dmgr, config, params):
     dmgr['randNos'] = randNos
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def calcIndices(dmgr, config, params):
     # Maybe make this function neater by giving filtering functions as params or in a seperate file??
 
@@ -557,7 +554,7 @@ def calcIndices(dmgr, config, params):
     # print(dmgr['boolIndices'])
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def calcElectricPowerProfiles(dmgr, config, params):
     '''
     Calculates electric power profiles that serve as outflow of the fleet batteries.
@@ -593,7 +590,7 @@ def calcElectricPowerProfiles(dmgr, config, params):
     # datalogger.info(electricPowerProfiles)
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def filterConsBatProfiles(dmgr, config, params):
     '''
     Sets all profile values with indexDSM = False to extreme values. For SoC max profiles, this means a value
@@ -631,7 +628,7 @@ def filterConsBatProfiles(dmgr, config, params):
     # print(chargeMaxProfilesDSM.ix[~boolIndices['indexDSM'].astype('bool'),:])
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def indexFilter(dmgr, config, params):
     '''
     Filters out profiles where indexCons is False.
@@ -661,7 +658,7 @@ def indexFilter(dmgr, config, params):
     # print(len(profilesFilterCons[params['profiles'][0]]))
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def socProfileSelection(dmgr, config, params):
     '''
     Selects the nth highest value for each hour for min (max) profiles based on the percentage given in parameter
@@ -712,7 +709,7 @@ def socProfileSelection(dmgr, config, params):
     # print(profilesRaw['chargeMaxProfilesDSM'].iloc[:, 12].nsmallest(noProfilesFilter))
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def normalizeProfiles(dmgr, config, params):
     # ToDo: Implement a normalization to the maximum of a given profile
 
@@ -746,7 +743,7 @@ def normalizeProfiles(dmgr, config, params):
     # datalogger.info(outputProfiles)
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def filterConsProfiles(dmgr, config, params):
     '''
     Filter out all profiles from given profile types whose boolean indices (so far DSM or cons) are FALSE.
@@ -782,7 +779,7 @@ def considerProfiles(profiles, consider, colStart, colEnd, colCons):
     return profilesOut
 
 # so far not used. Plug profiles are aggregated in the action aggregateProfiles.
-@action('VencoPy')
+# @action('VencoPy')
 def aggregatePlugProfiles(dmgr, config, params):
     '''
     This action aggregates all single-vehicle profiles that are considered to one fleet profile. There is a separate
@@ -806,7 +803,7 @@ def aggregatePlugProfiles(dmgr, config, params):
     # datalogger.info(profiles_out)
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def correctProfiles(dmgr, config, params):
     '''
     This action scales given profiles by a correction factor. It was written for VencoPy scaling consumption data
@@ -857,7 +854,7 @@ def correctProfiles(dmgr, config, params):
         dmgr[params['dmgrNames'][idx]] = profiles_corr[idx]
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def aggregateProfiles(dmgr, config, params):
 
     # TODO: Set column name to pname or use list instead of dataframe as looping data type
@@ -897,7 +894,7 @@ def aggregateProfiles(dmgr, config, params):
 
 # -----OUTPUT PROCESSING-------------------------------------------------------
 
-@action('VencoPy')
+# @action('VencoPy')
 def cloneProfilesToYear(dmgr, config, params):
     '''
     This action clones daily profiles to cover a whole year.
@@ -979,7 +976,7 @@ def cloneProfilesToYear(dmgr, config, params):
     # dmgr['uncCharge'] = df_UncontrCharge
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def writeProfilesToCSV(dmgr, config, params):
     '''
     Writes the profiles specified in parameter profiles to a csv file.
@@ -1007,7 +1004,7 @@ def writeProfilesToCSV(dmgr, config, params):
             prof.to_csv(dmgr['linkDict']['linkOutput'] + '/vencoOutput' + iprof + params['stradd'] + '.csv')
 
 
-@action('VencoPy')
+# @action('VencoPy')
 def appendOutputProfiles(dmgr, config, params):
     """
 
