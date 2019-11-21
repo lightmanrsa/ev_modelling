@@ -62,41 +62,88 @@ print(chargeProfiles)
 #      call: calcChargeProfile
 
 
-
+chargeMaxProfiles = calcChargeMaxProfiles(chargeProfiles,
+                                          consumptionProfiles,
+                                          scalars,
+                                          scalarsProc,
+                                          nIter=20)
 #  - action6:
 #      project: VencoPy
 #      call: calcChargeMaxProfiles
 #      nIter: 10
-#
+
+chargeProfilesUncontrolled = calcChargeProfileUncontrolled(chargeMaxProfiles,
+                                                           scalarsProc)
+
 #  - action7:
 #      project: VencoPy
 #      call: calcChargeProfileUncontrolled
-#
+
+driveProfilesFuelAux = calcDriveProfilesFuelAux(chargeMaxProfiles,
+                                                chargeProfilesUncontrolled,
+                                                driveProfiles,
+                                                scalars,
+                                                scalarsProc)
+
 #  - action8:
 #      project: VencoPy
 #      call: calcDriveProfilesFuelAux
-#
+
+chargeMinProfiles = calcChargeMinProfiles(chargeProfiles,
+                                          consumptionProfiles,
+                                          driveProfilesFuelAux,
+                                          scalars,
+                                          scalarsProc,
+                                          nIter=20)
+
+print(chargeMinProfiles)
+
 #  - action9:
 #      project: VencoPy
 #      call: calcChargeMinProfiles
 #      nIter: 10
-#
+
+randNos = createRandNo(driveProfiles)
+
 #  - action10:
 #      project: VencoPy
 #      call: createRandNo
-#
+
+boolIndices = calcIndices(chargeProfiles,
+                          consumptionProfiles,
+                          driveProfiles,
+                          driveProfilesFuelAux,
+                          randNos,
+                          scalars,
+                          fuelDriveTolerance=0.001,
+                          isBEV=True)
+
+
 #  - action11:
 #      project: VencoPy
 #      call: calcIndices
 #      fuelDriveTolerance: 0.001
 #      isBEV2030: True
-#
+
+
+electricPowerProfiles = calcElectricPowerProfiles(consumptionProfiles,
+                                                  driveProfilesFuelAux,
+                                                  scalars,
+                                                  boolIndices,
+                                                  scalarsProc,
+                                                  filterIndex='indexCons')
+
+print(electricPowerProfiles)
+
+
 #  - action16:
 #      project: VencoPy
 #      call: calcElectricPowerProfiles
 #      dmgrName: 'electricPowerProfiles'
 #      filterIndex: indexCons
-#
+
+chargeMaxProfilesDSM, chargeMinProfilesDSM = filterConsBatProfiles()
+
 #  - action12:
 #      project: VencoPy
 #      call: filterConsBatProfiles

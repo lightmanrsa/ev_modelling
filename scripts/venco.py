@@ -259,7 +259,7 @@ def calcChargeProfile(plugProfiles, scalars):
 
 
 # @action('VencoPy')
-def calcChargeMaxProfiles(chargeProfiles, scalars, nIter):
+def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsProc, nIter):
     '''
     Calculates all maximum SoC profiles under the assumption that batteries are always charged as soon as they
     are plugged to the grid. Values are assured to not fall below SoC_min * battery capacity or surpass
@@ -271,18 +271,17 @@ def calcChargeMaxProfiles(chargeProfiles, scalars, nIter):
     :return: Writes SoC max profiles to DataManager under the key 'chargeMaxProfiles'
     '''
 
-    chargeMaxProfiles = dmgr['chargeProfiles'].copy()
-    chargeProfiles = dmgr['chargeProfiles'].copy()
-    consumptionProfiles = dmgr['consumptionProfiles'].copy()
-    batCapMin = dmgr['scalars'].loc['Battery size', 'value'] * dmgr['scalars'].loc['SoCmin', 'value']
-    batCapMax = dmgr['scalars'].loc['Battery size', 'value'] * dmgr['scalars'].loc['SoCmax', 'value']
-    nHours = dmgr['scalarsProc']['noHours']
-    nIter = params['nIter']
+    chargeMaxProfiles = chargeProfiles.copy()
+    chargeProfiles = chargeProfiles.copy()
+    consumptionProfiles = consumptionProfiles.copy()
+    batCapMin = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmin', 'value']
+    batCapMax = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmax', 'value']
+    nHours = scalarsProc['noHours']
 
     idxIt = 1
-    while idxIt <= nIter: #ToDo implement as for-loop
+    for idxIt in range(nIter): #ToDo implement as for-loop
         # ToDo: np.where() replace by pd.something(),
-        # ToDo: prohibit typecasting str(idx) in data preparation step colnames as integers {smell}
+        # ToDo: prohibit typecasting str(idx) in data preparation step colnames as integers {smell} in function indexProfiles()
         for idx in range(nHours):
             # testing line
             # chargeMaxProfiles.ix[3, '0'] = 15.0
@@ -304,25 +303,25 @@ def calcChargeMaxProfiles(chargeProfiles, scalars, nIter):
                                                       chargeMaxProfiles[str(idx)],
                                                       batCapMin)
         devCrit = chargeMaxProfiles[str(nHours - 1)].sum() - chargeMaxProfiles[str(0)].sum()
-        # datalogger.info(devCrit)
+        print(devCrit)
         idxIt += 1
 
     # print(chargeMaxProfile.ix[0:20, :], flush=True)
     chargeMaxProfiles.drop(labels='newCharge', axis='columns', inplace=True)
-    dmgr['chargeMaxProfiles'] = chargeMaxProfiles
+    return(chargeMaxProfiles)
 
 
 # @action('VencoPy')
-def calcChargeProfileUncontrolled(dmgr, config, params):
+def calcChargeProfileUncontrolled(chargeMaxProfiles, scalarsProc):
     '''
     Calculates the uncontrolled electric charging based on SoC Max profiles for each hour for each profile.
 
     :return: Writes uncontrolled charging profiles to Data Manager under the key 'chargeProfilesUncontrolled'
     '''
 
-    chargeMaxProfiles = dmgr['chargeMaxProfiles'].copy()
+    chargeMaxProfiles = chargeMaxProfiles.copy()
     chargeProfilesUncontrolled = chargeMaxProfiles.copy()
-    nHours = dmgr['scalarsProc']['noHours']
+    nHours = scalarsProc['noHours']
     # ToDo: lastHour
     # ToDo: erradicate else-statement by indexing -1
 
@@ -347,12 +346,12 @@ def calcChargeProfileUncontrolled(dmgr, config, params):
     chargeProfilesUncontrolled[str(0)] = \
         (chargeProfilesUncontrolled[str(1)] + chargeProfilesUncontrolled[str(nHours - 1)])/2
 
-    dmgr['chargeProfilesUncontrolled'] = chargeProfilesUncontrolled
+    return(chargeProfilesUncontrolled)
     # datalogger.info(chargeProfilesUncontrolled)
 
 
 # @action('VencoPy')
-def calcDriveProfilesFuelAux(dmgr, config, params):
+def calcDriveProfilesFuelAux(chargeMaxProfiles, chargeProfilesUncontrolled, driveProfiles, scalars, scalarsProc):
 
     #ToDo: alternative vectorized format for looping over columns? numpy, pandas: broadcasting-rules
     #Profile is negative - is this on purpose? Does it make sense?
@@ -365,16 +364,16 @@ def calcDriveProfilesFuelAux(dmgr, config, params):
     :return: Writes the auxilliary fuel demand to the DataManager under the key 'driveProfilesFuelAux'.
     '''
 
-    chargeMaxProfiles = dmgr['chargeMaxProfiles'].copy()
-    chargeProfilesUncontrolled = dmgr['chargeProfilesUncontrolled'].copy()
-    driveProfiles = dmgr['driveProfiles'].copy()
-    consumptionPower = dmgr['scalars'].loc['Verbrauch NEFZ CD', 'value']
-    consumptionFuel = dmgr['scalars'].loc['Verbrauch NEFZ CS', 'value']
+#    chargeMaxProfiles = dmgr['chargeMaxProfiles'].copy()
+#    chargeProfilesUncontrolled = dmgr['chargeProfilesUncontrolled'].copy()
+#    driveProfiles = dmgr['driveProfiles'].copy()
+    consumptionPower = scalars.loc['Verbrauch NEFZ CD', 'value']
+    consumptionFuel = scalars.loc['Verbrauch NEFZ CS', 'value']
 
     # initialize data set for filling up later on
-    driveProfilesFuelAux = dmgr['chargeMaxProfiles'].copy()
+    driveProfilesFuelAux = chargeMaxProfiles.copy()
 
-    nHours = dmgr['scalarsProc']['noHours']
+    nHours = scalarsProc['noHours']
     # datalogger.info(nHours, range(nHours))
 
     for idx in range(nHours):
@@ -397,12 +396,12 @@ def calcDriveProfilesFuelAux(dmgr, config, params):
 
     driveProfilesFuelAux = driveProfilesFuelAux.round(4)
 
-    dmgr['driveProfilesFuelAux'] = driveProfilesFuelAux
+    return(driveProfilesFuelAux)
     # datalogger.info(driveProfilesFuelAux)
 
 
 # @action('VencoPy')
-def calcChargeMinProfiles(dmgr, config, params):
+def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuelAux, scalars, scalarsProc, nIter):
     '''
     Calculates minimum SoC profiles assuming that the hourly mileage has to exactly be fulfilled but no battery charge
     is kept inspite of fulfilling the mobility demand. It represents the minimum charge that a vehicle battery has to
@@ -415,16 +414,12 @@ def calcChargeMinProfiles(dmgr, config, params):
     :return: The SoC Min profiles are written to the DataManager under the key of 'chargeMinProfiles'.
     '''
 
-    chargeMinProfiles = dmgr['chargeProfiles'].copy()
-    chargeProfiles = dmgr['chargeProfiles'].copy()
-    consumptionProfiles = dmgr['consumptionProfiles'].copy()
-    driveProfilesFuelAux = dmgr['driveProfilesFuelAux'].copy()
-    batCapMin = dmgr['scalars'].loc['Battery size', 'value'] * dmgr['scalars'].loc['SoCmin', 'value']
-    batCapMax = dmgr['scalars'].loc['Battery size', 'value'] * dmgr['scalars'].loc['SoCmax', 'value']
-    consElectric = dmgr['scalars'].loc['Verbrauch NEFZ CD', 'value']
-    consGasoline = dmgr['scalars'].loc['Verbrauch NEFZ CS', 'value']
-    nHours = dmgr['scalarsProc']['noHours']
-    nIter = params['nIter']
+    chargeMinProfiles = chargeProfiles.copy()
+    batCapMin = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmin', 'value']
+    batCapMax = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmax', 'value']
+    consElectric = scalars.loc['Verbrauch NEFZ CD', 'value']
+    consGasoline = scalars.loc['Verbrauch NEFZ CS', 'value']
+    nHours = scalarsProc['noHours']
 
     idxIt = 1
     while idxIt <= nIter:
@@ -452,7 +447,7 @@ def calcChargeMinProfiles(dmgr, config, params):
                                                       batCapMax)
 
         devCrit = chargeMinProfiles[str(nHours - 1)].sum() - chargeMinProfiles[str(0)].sum()
-        # datalogger.info(devCrit)
+        print(devCrit)
         idxIt += 1
 
     # For validation
@@ -462,19 +457,19 @@ def calcChargeMinProfiles(dmgr, config, params):
     # print(chargeMinProfiles.ix[np.isin(chargeMinProfiles['CASEID'], caseids), :nHours + 2], flush=True)
 
     chargeMinProfiles.drop('newCharge', axis='columns', inplace=True)
-    dmgr['chargeMinProfiles'] = chargeMinProfiles
+    return(chargeMinProfiles)
     # datalogger.info(chargeMinProfiles)
 
 
 # @action('VencoPy')
-def createRandNo(dmgr, config, params):
+def createRandNo(driveProfiles):
     '''
     Creates a random number between 0 and 1 for each profile based on driving profiles.
 
     :return: Write a series with the same indices as the input driving profiles in the Data Manager.
     Use the key 'randNos'
     '''
-    idxData = dmgr['driveProfiles'].copy() # preparing data with the indices, next(iter(dmgr['driveProfiles'].columns))
+    idxData = driveProfiles.copy() # preparing data with the indices, next(iter(dmgr['driveProfiles'].columns))
 
     # print(profiles)
     # noIdxCols = len(driveProfiles.columns) - \
@@ -487,11 +482,18 @@ def createRandNo(dmgr, config, params):
     idxData['randNo'] = [random() for _ in range(len(idxData))]  # generate one random number for each profile
     randNos = idxData.loc[:, 'randNo']
 
-    dmgr['randNos'] = randNos
+    return(randNos)
 
 
 # @action('VencoPy')
-def calcIndices(dmgr, config, params):
+def calcIndices(chargeProfiles,
+                consumptionProfiles,
+                driveProfiles,
+                driveProfilesFuelAux,
+                randNos,
+                scalars,
+                fuelDriveTolerance,
+                isBEV):
     # Maybe make this function neater by giving filtering functions as params or in a seperate file??
 
     '''
@@ -507,17 +509,11 @@ def calcIndices(dmgr, config, params):
     indexDSM and the same indices as the other profiles.
     '''
 
-    chargeProfiles = dmgr['chargeProfiles'].copy()
-    consumptionProfiles = dmgr['consumptionProfiles'].copy()
-    driveProfiles = dmgr['driveProfiles'].copy()
-    driveProfilesFuelAux = dmgr['driveProfilesFuelAux'].copy()
-    randNos = dmgr['randNos'].copy()
-    boolBEV = dmgr['scalars'].loc['EREV oder BEV?', 'value']
-    minDailyMileage = dmgr['scalars'].loc['Minimum daily mileage', 'value']
-    batSize = dmgr['scalars'].loc['Battery size', 'value']
-    socMax = dmgr['scalars'].loc['SoCmax', 'value']
-    socMin = dmgr['scalars'].loc['SoCmin', 'value']
-    fuelDriveTolerance = params['fuelDriveTolerance']
+    boolBEV = scalars.loc['EREV oder BEV?', 'value']
+    minDailyMileage = scalars.loc['Minimum daily mileage', 'value']
+    batSize = scalars.loc['Battery size', 'value']
+    socMax = scalars.loc['SoCmax', 'value']
+    socMin = scalars.loc['SoCmin', 'value']
 
     boolIndices = driveProfiles.copy()
 
@@ -528,7 +524,7 @@ def calcIndices(dmgr, config, params):
     boolIndices['bolMinDailyMileage'] = driveProfiles.sum(axis='columns') > \
                                         (2 * randNos * minDailyMileage +
                                          (1 - randNos) * minDailyMileage * #.loc[:, 'randNo']
-                                         params['isBEV2030'])
+                                         isBEV)
     boolIndices['indexCons'] = boolIndices.loc[:, 'bolFuelDriveTolerance'] & \
                                boolIndices.loc[:, 'bolMinDailyMileage']
     boolIndices['bolConsumption'] = consumptionProfiles.sum(axis=1) < \
@@ -537,10 +533,11 @@ def calcIndices(dmgr, config, params):
                                 batSize * (socMax - socMin)
     boolIndices['indexDSM'] = boolIndices['indexCons'] & boolIndices['bolConsumption'] & boolIndices['bolSuffBat']
 
-    mainlogger.info('There are ' + str(sum(boolIndices['indexCons'])) + ' considered profiles and ' + \
+    print('There are ' + str(sum(boolIndices['indexCons'])) + ' considered profiles and ' + \
                     str(sum(boolIndices['indexDSM'])) + ' DSM eligible profiles.')
     boolIndices_out = boolIndices.loc[:, ['randNo', 'indexCons', 'indexDSM']]
-    dmgr['boolIndices'] = boolIndices_out
+
+    return(boolIndices_out)
 
     # datalogger.info(boolIndices_out)
 
@@ -555,7 +552,8 @@ def calcIndices(dmgr, config, params):
 
 
 # @action('VencoPy')
-def calcElectricPowerProfiles(dmgr, config, params):
+def calcElectricPowerProfiles(consumptionProfiles, driveProfilesFuelAux, scalars, boolIndices, scalarsProc,
+                              filterIndex):
     '''
     Calculates electric power profiles that serve as outflow of the fleet batteries.
 
@@ -566,32 +564,32 @@ def calcElectricPowerProfiles(dmgr, config, params):
     Data Manager under the key specified by dmgrName.
     '''
 
-    consumptionProfiles = dmgr['consumptionProfiles'].copy()
-    driveProfilesFuelAux = dmgr['driveProfilesFuelAux'].copy()
-    consumptionPower = dmgr['scalars'].loc['Verbrauch NEFZ CD', 'value']
-    consumptionFuel = dmgr['scalars'].loc['Verbrauch NEFZ CS', 'value']
-    indexCons = dmgr['boolIndices'].loc[:, 'indexCons']
-    indexDSM = dmgr['boolIndices'].loc[:, 'indexDSM']
+    # consumptionProfiles = dmgr['consumptionProfiles'].copy()
+    # driveProfilesFuelAux = dmgr['driveProfilesFuelAux'].copy()
+    consumptionPower = scalars.loc['Verbrauch NEFZ CD', 'value']
+    consumptionFuel = scalars.loc['Verbrauch NEFZ CS', 'value']
+    indexCons = boolIndices.loc[:, 'indexCons']
+    indexDSM = boolIndices.loc[:, 'indexDSM']
     # datalogger.info(indexCons)
 
-    nHours = dmgr['scalarsProc']['noHours']
+    nHours = scalarsProc['noHours']
     electricPowerProfiles = consumptionProfiles.copy()
 
     for idx in range(nHours):
         electricPowerProfiles[str(idx)] = (consumptionProfiles[str(idx)] - driveProfilesFuelAux[str(idx)] *
                                            (consumptionPower / consumptionFuel))
 
-        if params['filterIndex'] == 'indexCons':
+        if filterIndex == 'indexCons':
             electricPowerProfiles[str(idx)] = electricPowerProfiles[str(idx)] * indexCons
-        elif params['filterIndex'] == 'indexCons':
+        elif filterIndex == 'indexDSM':
             electricPowerProfiles[str(idx)] = electricPowerProfiles[str(idx)] * indexDSM
 
-    dmgr[params['dmgrName']] = electricPowerProfiles
+    return(electricPowerProfiles)
     # datalogger.info(electricPowerProfiles)
 
 
 # @action('VencoPy')
-def filterConsBatProfiles(dmgr, config, params):
+def filterConsBatProfiles(chargeMaxProfiles, chargeMinProfiles, boolIndices, minValue, maxValue):
     '''
     Sets all profile values with indexDSM = False to extreme values. For SoC max profiles, this means a value
     that is way higher than SoC max capacity. For SoC min this means usually 0. This setting is important for the
@@ -602,21 +600,19 @@ def filterConsBatProfiles(dmgr, config, params):
     :return: Writes the two profiles files 'chargeMaxProfilesDSM' and 'chargeMinProfilesDSM' to the DataManager.
     '''
 
-    chargeMaxProfilesDSM = dmgr['chargeMaxProfiles'].copy()
-    chargeMinProfilesDSM = dmgr['chargeMinProfiles'].copy()
-    boolIndices = dmgr['boolIndices']
+    chargeMaxProfilesDSM = chargeMaxProfiles.copy()
+    chargeMinProfilesDSM = chargeMinProfiles.copy()
 
     # if len(chargeMaxProfilesCons) == len(boolIndices): #len(chargeMaxProfilesCons) = len(chargeMinProfilesCons) by design
     # How can I catch pandas.core.indexing.IndexingError ?
     try:
-        chargeMaxProfilesDSM.loc[~boolIndices['indexDSM'].astype('bool'), :] = params['maxValue']
-        chargeMinProfilesDSM.loc[~boolIndices['indexDSM'].astype('bool'), :] = params['minValue']
+        chargeMaxProfilesDSM.loc[~boolIndices['indexDSM'].astype('bool'), :] = maxValue
+        chargeMinProfilesDSM.loc[~boolIndices['indexDSM'].astype('bool'), :] = minValue
     except:
         print("Declaration doesn't work. "
               "Maybe the length of boolIndices differs from the length of chargeMaxProfiles")
 
-    dmgr['chargeMaxProfilesDSM'] = chargeMaxProfilesDSM
-    dmgr['chargeMinProfilesDSM'] = chargeMinProfilesDSM
+    return(chargeMaxProfilesDSM, chargeMinProfilesDSM)
 
     # datalogger.info(len(chargeMaxProfilesDSM))
 
