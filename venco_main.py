@@ -13,6 +13,7 @@ from functools import reduce
 from random import seed
 from random import random
 from scripts.venco import *
+from scripts.plotting import *
 
 
 #ToDO: Write an action to write processed scalars to scalarsProc after filtering to write meta-information to file
@@ -231,8 +232,25 @@ driveProfilesFuelAuxCorr = correctProfiles(scalars, driveProfilesFuelAuxAgg, 'fu
 #      dmgrNames: ['plugProfilesCons_out', 'chargeProfilesUncontrolled_out',
 #                  'electricPowerProfiles_out', 'driveProfilesFuelAux_out']
 
+cloneProfilesToYear(socMinNorm, linkDict, 8760, technologyLabel='BEV-S',
+                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+
 cloneProfilesToYear(socMaxNorm, linkDict, 8760, technologyLabel='BEV-S',
-                    filename='BEV_S_socMax_vencoPy_MR1_alpha1_batCap40_cons15')
+                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+
+cloneProfilesToYear(chargeProfilesUncontrolledCorr, linkDict, 8760, technologyLabel='BEV-S',
+                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+
+cloneProfilesToYear(electricPowerProfilesCorr, linkDict, 8760, technologyLabel='BEV-S',
+                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+
+cloneProfilesToYear(driveProfilesFuelAuxCorr, linkDict, 8760, technologyLabel='BEV-S',
+                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+
+cloneProfilesToYear(plugProfilesAgg, linkDict, 8760, technologyLabel='BEV-S',
+                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+
+
 
 #  - action21:
 #      project: VencoPy
@@ -244,7 +262,9 @@ cloneProfilesToYear(socMaxNorm, linkDict, 8760, technologyLabel='BEV-S',
 #      nodes: ['Germany_North', 'Germany_South']
 #      outputStrPre: BEV-S_
 #      outputStrPost: _Venco_MR1_alpha1_batCap40_cons15
-#
+
+
+
 #  - plottingAction1:
 #      project: VencoPy
 #      call: linePlot
