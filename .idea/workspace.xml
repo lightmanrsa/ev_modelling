@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ecd0004f-94bb-43f5-9ca2-d220fe3ef765" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/VencoPy_conf.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/VencoPy_conf.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/venco.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/venco.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/userVenco.yaml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/venco_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/venco_main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,8 +18,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/venco_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="214">
-              <caret line="144" column="67" lean-forward="true" selection-start-line="144" selection-start-column="67" selection-end-line="144" selection-end-column="67" />
+            <state relative-caret-position="263">
+              <caret line="234" selection-start-line="234" selection-end-line="234" />
               <folding>
                 <element signature="e#224#235#0" expanded="true" />
               </folding>
@@ -26,16 +27,15 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scripts/venco.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="461" lean-forward="true" selection-start-line="461" selection-end-line="461" />
+            <state relative-caret-position="350">
+              <caret line="897" column="40" selection-start-line="897" selection-start-column="40" selection-end-line="897" selection-end-column="40" />
               <folding>
                 <element signature="e#204#273#0" />
                 <element signature="e#593#597#0" />
                 <element signature="e#599#621#0" />
-                <element signature="e#950#1023#0" />
                 <element signature="e#1128#1900#0" />
                 <element signature="e#1143#1874#0" />
                 <element signature="e#1937#2256#0" />
@@ -67,90 +67,19 @@
                 <element signature="e#9677#10106#0" />
                 <element signature="e#9677#9957#1" />
                 <element signature="e#10227#10901#1" />
-                <element signature="e#13207#13437#1" />
-                <element signature="e#14816#17116#0" />
-                <element signature="e#14985#15384#1" />
-                <element signature="e#15386#15443#0" />
-                <element signature="e#15923#16796#0" />
-                <element signature="e#15923#15937#0" />
-                <element signature="e#16430#16796#0" />
-                <element signature="e#17259#20363#0" />
-                <element signature="e#17259#17952#1" />
-                <element signature="e#18379#19959#0" />
-                <element signature="e#18418#19823#0" />
-                <element signature="e#18418#18432#0" />
-                <element signature="e#18525#18751#0" />
-                <element signature="e#18786#19823#0" />
-                <element signature="e#19965#19981#0" />
-                <element signature="e#20424#21286#0" />
-                <element signature="e#20424#20651#1" />
-                <element signature="e#20769#20786#0" />
-                <element signature="e#21566#24444#0" />
-                <element signature="e#21669#22497#1" />
-                <element signature="e#24113#24147#0" />
-                <element signature="e#24624#26124#0" />
-                <element signature="e#24624#25088#1" />
-                <element signature="e#25094#25152#0" />
-                <element signature="e#25605#26044#0" />
-                <element signature="e#26201#26781#1" />
-                <element signature="e#27356#27477#0" />
-                <element signature="e#27597#27641#0" />
-                <element signature="e#28012#29032#0" />
-                <element signature="e#28012#28291#1" />
-                <element signature="e#28546#28711#0" />
-                <element signature="e#28716#28726#0" />
-                <element signature="e#28918#28972#0" />
-                <element signature="e#29107#31350#0" />
-                <element signature="e#29107#29961#1" />
-                <element signature="e#30218#30815#0" />
-                <element signature="e#30263#30511#0" />
-                <element signature="e#30566#30815#0" />
-                <element signature="e#30821#30857#0" />
-                <element signature="e#30975#30993#0" />
-                <element signature="e#31178#31261#0" />
-                <element signature="e#31423#32594#0" />
-                <element signature="e#31496#31958#1" />
-                <element signature="e#32238#32457#0" />
-                <element signature="e#32668#33510#0" />
-                <element signature="e#32668#33083#1" />
-                <element signature="e#33586#33854#0" />
-                <element signature="e#33742#33831#0" />
-                <element signature="e#33748#33804#0" />
-                <element signature="e#33856#33936#0" />
-                <element signature="e#34011#34850#0" />
-                <element signature="e#34011#34444#1" />
-                <element signature="e#34921#37103#0" />
-                <element signature="e#34921#35639#1" />
-                <element signature="e#36301#36957#0" />
-                <element signature="e#36301#36313#0" />
-                <element signature="e#36465#36580#0" />
-                <element signature="e#36646#36757#0" />
-                <element signature="e#37177#38700#0" />
-                <element signature="e#37268#37715#1" />
-                <element signature="e#37893#38532#0" />
-                <element signature="e#38311#38488#0" />
-                <element signature="e#38702#38781#0" />
-                <element signature="e#38855#42155#0" />
-                <element signature="e#38855#39282#1" />
-                <element signature="e#39454#39481#0" />
-                <element signature="e#39685#39749#0" />
-                <element signature="e#40818#41189#0" />
-                <element signature="e#41975#42007#0" />
-                <element signature="e#42229#43174#0" />
-                <element signature="e#42229#42574#1" />
-                <element signature="e#42651#42716#0" />
-                <element signature="e#43002#43174#0" />
-                <element signature="e#43047#43174#0" />
-                <element signature="e#43250#44172#0" />
-                <element signature="e#43250#43330#1" />
-                <element signature="e#43497#43783#0" />
-                <element signature="e#43552#43752#0" />
-                <element signature="e#43873#44172#0" />
-                <element signature="e#44218#44446#0" />
-                <element signature="e#44258#44429#0" />
-                <element signature="e#44330#44400#0" />
-                <element signature="e#44449#44473#0" />
+                <element signature="e#11335#11380#0" />
+                <element signature="e#27979#28673#0" />
+                <element signature="e#34916#34940#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/config/timeseriesREMix.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="238">
+              <caret line="74" column="13" selection-start-line="74" selection-start-column="13" selection-end-line="74" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -158,22 +87,24 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config/VencoPy_conf.yaml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="23" column="14" selection-start-line="23" selection-start-column="14" selection-end-line="23" selection-end-column="14" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../REMix-OaM/OptiMo/projects/wulf_ni/paperModelCouplingCURRENT_repairCheckout/data/sus_base/sus_MR1_VencoPyProfiles/sus_2030/ana/__writeXls.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+            <state relative-caret-position="546">
+              <caret line="24" column="33" lean-forward="true" selection-start-line="24" selection-start-column="33" selection-end-line="24" selection-end-column="33" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>Cons</find>
+      <find>filterConsProfiles</find>
+      <find>, boolIndices, critCol='indexCons'</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>Agg</replace>
+      <replace>aggregateProfiles</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -233,8 +164,9 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -302,52 +234,139 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24973656" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.115384616" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32936078" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.3564464" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info active="true" anchor="bottom" id="TODO" order="6" visible="true" weight="0.32936078" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32936078" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32936078" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32936078" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/scripts/venco.py</url>
+          <line>894</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>profilesOut.loc[:, i] = np.round(profileCloned, 3)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>profilesOut.loc[:, i] = np.round(profileCLoned, 3)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>profilesOut.loc[:, i]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>profilesOut[:,'GermanyNorth_data']</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>profilesOut</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>profilesOut[:, 'GermanyNorth_data']</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>np.round(profileCloned, 3)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>cfg['NonNullNodes']</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>cfg</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/config/VencoPy_conf.yaml">
+    <entry file="file://$PROJECT_DIR$/../REMix-OaM/OptiMo/projects/wulf_ni/paperModelCouplingCURRENT_repairCheckout/data/sus_base/sus_MR1_VencoPyProfiles/sus_2030/ana/__writeXls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="23" column="14" selection-start-line="23" selection-start-column="14" selection-end-line="23" selection-end-column="14" />
+        <state relative-caret-position="340">
+          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ProgramData/Miniconda3/envs/VencoPy/Lib/site-packages/pandas/core/generic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="380">
+          <caret line="1897" selection-start-line="1897" selection-end-line="1897" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ProgramData/Miniconda3/envs/VencoPy/Lib/site-packages/pandas/core/indexes/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="4229" selection-start-line="4229" selection-end-line="4229" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/venco_main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="144" column="67" lean-forward="true" selection-start-line="144" selection-start-column="67" selection-end-line="144" selection-end-column="67" />
+        <state relative-caret-position="263">
+          <caret line="234" selection-start-line="234" selection-end-line="234" />
           <folding>
             <element signature="e#224#235#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/config/VencoPy_conf.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="546">
+          <caret line="24" column="33" lean-forward="true" selection-start-line="24" selection-start-column="33" selection-end-line="24" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/timeseriesREMix.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="74" column="13" selection-start-line="74" selection-start-column="13" selection-end-line="74" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/venco.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="461" lean-forward="true" selection-start-line="461" selection-end-line="461" />
+        <state relative-caret-position="350">
+          <caret line="897" column="40" selection-start-line="897" selection-start-column="40" selection-end-line="897" selection-end-column="40" />
           <folding>
             <element signature="e#204#273#0" />
             <element signature="e#593#597#0" />
             <element signature="e#599#621#0" />
-            <element signature="e#950#1023#0" />
             <element signature="e#1128#1900#0" />
             <element signature="e#1143#1874#0" />
             <element signature="e#1937#2256#0" />
@@ -379,97 +398,10 @@
             <element signature="e#9677#10106#0" />
             <element signature="e#9677#9957#1" />
             <element signature="e#10227#10901#1" />
-            <element signature="e#13207#13437#1" />
-            <element signature="e#14816#17116#0" />
-            <element signature="e#14985#15384#1" />
-            <element signature="e#15386#15443#0" />
-            <element signature="e#15923#16796#0" />
-            <element signature="e#15923#15937#0" />
-            <element signature="e#16430#16796#0" />
-            <element signature="e#17259#20363#0" />
-            <element signature="e#17259#17952#1" />
-            <element signature="e#18379#19959#0" />
-            <element signature="e#18418#19823#0" />
-            <element signature="e#18418#18432#0" />
-            <element signature="e#18525#18751#0" />
-            <element signature="e#18786#19823#0" />
-            <element signature="e#19965#19981#0" />
-            <element signature="e#20424#21286#0" />
-            <element signature="e#20424#20651#1" />
-            <element signature="e#20769#20786#0" />
-            <element signature="e#21566#24444#0" />
-            <element signature="e#21669#22497#1" />
-            <element signature="e#24113#24147#0" />
-            <element signature="e#24624#26124#0" />
-            <element signature="e#24624#25088#1" />
-            <element signature="e#25094#25152#0" />
-            <element signature="e#25605#26044#0" />
-            <element signature="e#26201#26781#1" />
-            <element signature="e#27356#27477#0" />
-            <element signature="e#27597#27641#0" />
-            <element signature="e#28012#29032#0" />
-            <element signature="e#28012#28291#1" />
-            <element signature="e#28546#28711#0" />
-            <element signature="e#28716#28726#0" />
-            <element signature="e#28918#28972#0" />
-            <element signature="e#29107#31350#0" />
-            <element signature="e#29107#29961#1" />
-            <element signature="e#30218#30815#0" />
-            <element signature="e#30263#30511#0" />
-            <element signature="e#30566#30815#0" />
-            <element signature="e#30821#30857#0" />
-            <element signature="e#30975#30993#0" />
-            <element signature="e#31178#31261#0" />
-            <element signature="e#31423#32594#0" />
-            <element signature="e#31496#31958#1" />
-            <element signature="e#32238#32457#0" />
-            <element signature="e#32668#33510#0" />
-            <element signature="e#32668#33083#1" />
-            <element signature="e#33586#33854#0" />
-            <element signature="e#33742#33831#0" />
-            <element signature="e#33748#33804#0" />
-            <element signature="e#33856#33936#0" />
-            <element signature="e#34011#34850#0" />
-            <element signature="e#34011#34444#1" />
-            <element signature="e#34921#37103#0" />
-            <element signature="e#34921#35639#1" />
-            <element signature="e#36301#36957#0" />
-            <element signature="e#36301#36313#0" />
-            <element signature="e#36465#36580#0" />
-            <element signature="e#36646#36757#0" />
-            <element signature="e#37177#38700#0" />
-            <element signature="e#37268#37715#1" />
-            <element signature="e#37893#38532#0" />
-            <element signature="e#38311#38488#0" />
-            <element signature="e#38702#38781#0" />
-            <element signature="e#38855#42155#0" />
-            <element signature="e#38855#39282#1" />
-            <element signature="e#39454#39481#0" />
-            <element signature="e#39685#39749#0" />
-            <element signature="e#40818#41189#0" />
-            <element signature="e#41975#42007#0" />
-            <element signature="e#42229#43174#0" />
-            <element signature="e#42229#42574#1" />
-            <element signature="e#42651#42716#0" />
-            <element signature="e#43002#43174#0" />
-            <element signature="e#43047#43174#0" />
-            <element signature="e#43250#44172#0" />
-            <element signature="e#43250#43330#1" />
-            <element signature="e#43497#43783#0" />
-            <element signature="e#43552#43752#0" />
-            <element signature="e#43873#44172#0" />
-            <element signature="e#44218#44446#0" />
-            <element signature="e#44258#44429#0" />
-            <element signature="e#44330#44400#0" />
-            <element signature="e#44449#44473#0" />
+            <element signature="e#11335#11380#0" />
+            <element signature="e#27979#28673#0" />
+            <element signature="e#34916#34940#0" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../REMix-OaM/OptiMo/projects/wulf_ni/paperModelCouplingCURRENT_repairCheckout/data/sus_base/sus_MR1_VencoPyProfiles/sus_2030/ana/__writeXls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
         </state>
       </provider>
     </entry>

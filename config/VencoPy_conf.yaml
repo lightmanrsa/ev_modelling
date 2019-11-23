@@ -9,15 +9,6 @@
 # This script is written to replace the excel tool VENCO (Vehicle ENergy COnsumption profiles)
 # by a more abstract and more powerful python version.
 
-##### Definition of parameters here?? ####
-#
-#from XX import YY as ZZ
-#from time import time
-#import xlrd as xlrd
-#import pandas as pd
-#import os
-#import configParser
-#
 ####### file links and paths ###
 #
 

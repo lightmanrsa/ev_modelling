@@ -14,6 +14,11 @@ from random import seed
 from random import random
 from scripts.venco import *
 
+
+#ToDO: Write an action to write processed scalars to scalarsProc after filtering to write meta-information to file
+#ToDo: Maybe consolidate selection actions to one aggregation and one filtering action
+
+
 #----- data and config read-in -----
 linkConfig = 'C:/vencopy_repo/config/VencoPy_conf.yaml'
 linkDict, scalars, driveProfiles_raw, plugProfiles_raw = readVencoInput(linkConfig)
@@ -55,7 +60,6 @@ consumptionProfiles = calcConsumptionProfile(driveProfiles, scalars)
 ##      tag: test
 
 chargeProfiles = calcChargeProfile(plugProfiles, scalars)
-print(chargeProfiles)
 
 #  - action5:
 #      project: VencoPy
@@ -96,8 +100,6 @@ chargeMinProfiles = calcChargeMinProfiles(chargeProfiles,
                                           scalarsProc,
                                           nIter=20)
 
-print(chargeMinProfiles)
-
 #  - action9:
 #      project: VencoPy
 #      call: calcChargeMinProfiles
@@ -133,28 +135,37 @@ electricPowerProfiles = calcElectricPowerProfiles(consumptionProfiles,
                                                   scalarsProc,
                                                   filterIndex='indexCons')
 
-print(electricPowerProfiles)
-
-
 #  - action16:
 #      project: VencoPy
 #      call: calcElectricPowerProfiles
 #      dmgrName: 'electricPowerProfiles'
 #      filterIndex: indexCons
 
-chargeMaxProfilesDSM, chargeMinProfilesDSM = filterConsBatProfiles()
+chargeMaxProfilesDSM, chargeMinProfilesDSM = filterConsBatProfiles(chargeMaxProfiles, chargeMinProfiles, boolIndices,
+                                                                   minValue=0, maxValue=9999)
+
 
 #  - action12:
 #      project: VencoPy
 #      call: filterConsBatProfiles
 #      maxValue: 9999
 #      minValue: 0
-#
+
+profilesFilterConsMin, \
+profilesFilterConsMax, \
+profilesFilterDSMMin, \
+profilesFilterDSMMax = indexFilter(chargeMaxProfiles,
+                                   chargeMinProfiles,
+                                   boolIndices)
+
 #  - action13:
 #      project: VencoPy
 #      call: indexFilter
 #      profiles: ['chargeMaxProfilesDSM', 'chargeMinProfilesDSM']
-#
+
+SOCMin, SOCMax = socProfileSelection(profilesFilterConsMin, profilesFilterConsMax,
+                                     filter='singleValue', alpha=1)
+
 #  - action14:
 #      project: VencoPy
 #      call: socProfileSelection
@@ -164,33 +175,54 @@ chargeMaxProfilesDSM, chargeMinProfilesDSM = filterConsBatProfiles()
 #      filterMin:
 #            - chargeMaxProfilesDSM
 #      alpha: 1
-#
+
+
+socMinNorm, socMaxNorm = normalizeProfiles(scalars, SOCMin, SOCMax,
+                                           normReference='Battery size')
+
 #  - action15:
 #      project: VencoPy
 #      call: normalizeProfiles
 #      profiles: ['SOCMax', 'SOCMin']
 #      normReference: ['Battery size']
 #      dmgrNames: ['SOCMax_out', 'SOCMin_out']
-#
+
+plugProfilesCons = filterConsProfiles(plugProfiles, boolIndices, critCol='indexCons')
+electricPowerProfilesCons = filterConsProfiles(electricPowerProfiles, boolIndices, critCol='indexCons')
+chargeProfilesUncontrolledCons = filterConsProfiles(chargeProfilesUncontrolled, boolIndices, critCol='indexCons')
+driveProfilesFuelAuxCons = filterConsProfiles(driveProfilesFuelAux, boolIndices, critCol='indexCons')
+
 #  - action17:
 #      project: VencoPy
 #      call: filterConsProfiles
 #      profiles: ['plugProfiles', 'electricPowerProfiles', 'chargeProfilesUncontrolled', 'driveProfilesFuelAux']
 #      dmgrNames: ['plugProfilesCons', 'electricPowerProfilesCons',
 #                  'chargeProfilesUncontrolledCons', 'driveProfilesFuelAuxCons']
-#
+
+plugProfilesAgg = aggregateProfiles(plugProfilesCons)
+electricPowerProfilesAgg = aggregateProfiles(electricPowerProfilesCons)
+chargeProfilesUncontrolledAgg = aggregateProfiles(chargeProfilesUncontrolledCons)
+driveProfilesFuelAuxAgg = aggregateProfiles(driveProfilesFuelAuxCons)
+
 #  - action18:
 #      project: VencoPy
 #      call: aggregatePlugProfiles
 #      profiles: ['plugProfilesCons']
-#
+
+
+chargeProfilesUncontrolledCorr = correctProfiles(scalars, chargeProfilesUncontrolledAgg, 'electric')
+electricPowerProfilesCorr = correctProfiles(scalars, electricPowerProfilesAgg, 'electric')
+driveProfilesFuelAuxCorr = correctProfiles(scalars, driveProfilesFuelAuxAgg, 'fuel')
+
 #  - action19:
 #      project: VencoPy
 #      call: correctProfiles
 #      profiles: ['chargeProfilesUncontrolledCons', 'electricPowerProfilesCons', 'driveProfilesFuelAuxCons']
 #      profType: ['electric', 'electric', 'fuel']
 #      dmgrNames: ['chargeProfilesUncontrolledCorr', 'electricPowerProfilesCorr','driveProfilesFuelAuxCorr']
-#
+
+
+# dont know why this is redundantly implemented here..
 #  - action20:
 #      project: VencoPy
 #      call: aggregateProfiles
@@ -198,7 +230,10 @@ chargeMaxProfilesDSM, chargeMinProfilesDSM = filterConsBatProfiles()
 #                 'electricPowerProfilesCorr', 'driveProfilesFuelAuxCorr']
 #      dmgrNames: ['plugProfilesCons_out', 'chargeProfilesUncontrolled_out',
 #                  'electricPowerProfiles_out', 'driveProfilesFuelAux_out']
-#
+
+cloneProfilesToYear(socMaxNorm, linkDict, 8760, technologyLabel='BEV-S',
+                    filename='BEV_S_socMax_vencoPy_MR1_alpha1_batCap40_cons15')
+
 #  - action21:
 #      project: VencoPy
 #      call: cloneProfilesToYear

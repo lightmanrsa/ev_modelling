@@ -600,14 +600,14 @@ def filterConsBatProfiles(chargeMaxProfiles, chargeMinProfiles, boolIndices, min
     :return: Writes the two profiles files 'chargeMaxProfilesDSM' and 'chargeMinProfilesDSM' to the DataManager.
     '''
 
-    chargeMaxProfilesDSM = chargeMaxProfiles.copy()
     chargeMinProfilesDSM = chargeMinProfiles.copy()
+    chargeMaxProfilesDSM = chargeMaxProfiles.copy()
 
     # if len(chargeMaxProfilesCons) == len(boolIndices): #len(chargeMaxProfilesCons) = len(chargeMinProfilesCons) by design
     # How can I catch pandas.core.indexing.IndexingError ?
     try:
-        chargeMaxProfilesDSM.loc[~boolIndices['indexDSM'].astype('bool'), :] = maxValue
         chargeMinProfilesDSM.loc[~boolIndices['indexDSM'].astype('bool'), :] = minValue
+        chargeMaxProfilesDSM.loc[~boolIndices['indexDSM'].astype('bool'), :] = maxValue
     except:
         print("Declaration doesn't work. "
               "Maybe the length of boolIndices differs from the length of chargeMaxProfiles")
@@ -625,7 +625,7 @@ def filterConsBatProfiles(chargeMaxProfiles, chargeMinProfiles, boolIndices, min
 
 
 # @action('VencoPy')
-def indexFilter(dmgr, config, params):
+def indexFilter(chargeMaxProfiles, chargeMinProfiles, boolIndices):
     '''
     Filters out profiles where indexCons is False.
 
@@ -634,113 +634,81 @@ def indexFilter(dmgr, config, params):
     by parameter profiles.
     '''
 
-    profiles = {}
-    for prof in params['profiles']:
-        profiles[prof] = dmgr[prof].copy()
-    boolIndices = dmgr['boolIndices'].copy()
-    profilesFilterDSM = {}
-    profilesFilterCons = {}
+    profilesFilterConsMin = chargeMinProfiles.loc[boolIndices['indexCons'], :]
+    profilesFilterConsMax = chargeMaxProfiles.loc[boolIndices['indexCons'], :]
+    profilesFilterDSMMin = chargeMinProfiles.loc[boolIndices['indexDSM'], :]
+    profilesFilterDSMMax = chargeMinProfiles.loc[boolIndices['indexDSM'], :]
 
-    # try:
-    for prof in params['profiles']:
-        profilesFilterCons[prof] = profiles[prof].loc[boolIndices['indexCons'], :]
-        profilesFilterDSM[prof] = profilesFilterCons[prof].loc[boolIndices['indexDSM'], :]
-    # except :
-    #     print('Declaration doesnt work. '
-    #           'Maybe the length of boolIndices differs from the length of chargeMaxProfiles')
-
-    dmgr['profilesCons'] = profilesFilterCons
-    # print(len(profilesFilterDSM[params['profiles'][0]]))
-    # print(len(profilesFilterCons[params['profiles'][0]]))
+    return(profilesFilterConsMin, profilesFilterConsMax, profilesFilterDSMMin, profilesFilterDSMMax)
 
 
 # @action('VencoPy')
-def socProfileSelection(dmgr, config, params):
+def socProfileSelection(profilesMin, profilesMax, filter, alpha):
     '''
     Selects the nth highest value for each hour for min (max) profiles based on the percentage given in parameter
     'alpha'. If alpha = 10, the 10%-biggest (10%-smallest) value is selected, all other values are disregarded.
-    Currently, in the Venco reproduction phase, the hourly values are selected independently of each other.
+    Currently, in the Venco reproduction phase, the hourly values are selected independently of each other. min and max
+    profiles have to have the same number of columns.
 
-    :param filter: Selection method. Currently, only 'singleValues' is available.
-    :param filterMax: Liste of DataManager keys pointing to profiles that should be filtered based on nsmallest()
-    :param filterMin: Liste of DataManager keys pointing to profiles that should be filtered based on nlargest()
-    :param alpha: Percentage, giving the amound of profiles whose mobility demand can not be fulfilled after selection.
-    :return: Writes the two profiles 'SOCMax' and 'SOCMin' to the DataManager.
+    :param profilesMin: Profiles giving minimum hypothetic SOC values to supply the driving demand at each hour
+    :param profilesMax: Profiles giving maximum hypothetic SOC values if vehicle is charged as soon as possible
+    :param filter: Filter method. Currently implemented: 'singleValue'
+    :param alpha: Percentage, giving the amount of profiles whose mobility demand can not be fulfilled after selection.
+    :return: Returns the two profiles 'SOCMax' and 'SOCMin' in the same time resolution as input profiles.
     '''
 
-    profilesRaw = dmgr['profilesCons'].copy()
+    noProfiles = len(profilesMin)
+    noProfilesFilter = int(alpha / 100 * noProfiles)
 
-    noProfiles = len(profilesRaw[next(iter(profilesRaw))])
-    noProfilesFilter = int(params['alpha'] / 100 * noProfiles)
-    outputProfiles = []
+    if filter == 'singleValue':
+        profileMinOut = profilesMin.iloc[0, :].copy()
+        for col in profilesMin:
+            profileMinOut[col] = min(profilesMin[col].nlargest(noProfilesFilter))
 
-    # try:
-    if params['filter'] == 'singleValue':
-        for maxp in params['filterMax']:
-            profiles = profilesRaw[maxp]
-            profileOut = profilesRaw[maxp].iloc[0, :].copy()
-            for col in profiles:
-                profileOut[col] = min(profiles[col].nlargest(noProfilesFilter))
-            outputProfiles.append(profileOut)
-
-        for minp in params['filterMin']:
-            profiles = profilesRaw[minp]
-            profileOut = profilesRaw[minp].iloc[0, :].copy()
-            for col in profiles:
-                profileOut[col] = max(profiles[col].nsmallest(noProfilesFilter))
-            outputProfiles.append(profileOut)
+        profileMaxOut = profilesMax.iloc[0, :].copy()
+        for col in profilesMax:
+            profileMaxOut[col] = max(profilesMax[col].nsmallest(noProfilesFilter))
 
     # elif params['filter'] == "profile"
-        # to be done
+        # ToDo: Profile specific filtering
+
     else:
-        datalogger.warn('You selected a filter method that is not implemented.')
+        raise ValueError('You selected a filter method that is not implemented.')
 
-    # except KeyError:
-    #     print('There was a key error. Check for correct profile declarations in your parameters')
-
-    dmgr['SOCMax'] = outputProfiles[1]
-    dmgr['SOCMin'] = outputProfiles[0]
-
-    # print(profilesRaw['chargeMinProfilesDSM'].iloc[:, 12].nlargest(noProfilesFilter))
-    # print(profilesRaw['chargeMaxProfilesDSM'].iloc[:, 12].nsmallest(noProfilesFilter))
+    return(profileMinOut, profileMaxOut)
 
 
 # @action('VencoPy')
-def normalizeProfiles(dmgr, config, params):
+def normalizeProfiles(scalars, socMin, socMax, normReference):
     # ToDo: Implement a normalization to the maximum of a given profile
 
     '''
     Normalizes given profiles with a given scalar reference.
 
-    :param profiles: DataManager keys pointing towards profiles that should be normalized
+    :param scalars: Input scalars for VencoPy for e.g. battery capacity
+    :param socMin: Minimum SOC profile subject to normalization
+    :param socMax: Minimum SOC profile subject to normalization
     :param normReference: Reference that is taken for normalization. This has to be given in scalar input data.
-    :param dmgrNames: Keys, under which the normalized profiles will be written to the DataManager
     :return: Writes the normalized profiles to the DataManager under the specified keys
     '''
 
-    profiles = {}
-    for prof in params['profiles']:
-        profiles[prof] = pd.DataFrame(dmgr[prof])
-
-    normReference = dmgr['scalars'].loc[params['normReference'], 'value']
-
-    print(profiles['SOCMax'].div(float(normReference)))
-    outputProfiles = []
+    normReference = scalars.loc[normReference, 'value']
 
     try:
-        for key, value in profiles.items():
-            outputProfiles.append(value.div(float(normReference)))
-        for idx in range(len(params['dmgrNames'])):
-            dmgr[params['dmgrNames'][idx]] = outputProfiles[idx]
+        # for key, value in profiles.items():
+        #     outputProfiles.append(value.div(float(normReference)))
+        socMinNorm = socMin.div(float(normReference))
+        socMaxNorm = socMax.div(float(normReference))
 
     except ValueError:
         print('There was a value error. I don\'t know what to tell you.')
 
+    return(socMinNorm, socMaxNorm)
     # datalogger.info(outputProfiles)
 
 
 # @action('VencoPy')
-def filterConsProfiles(dmgr, config, params):
+def filterConsProfiles(profile, boolIndices, critCol):
     '''
     Filter out all profiles from given profile types whose boolean indices (so far DSM or cons) are FALSE.
 
@@ -749,21 +717,11 @@ def filterConsProfiles(dmgr, config, params):
     :return: Stores filtered profiles in the DataManager under keys given in dmgrNames
     '''
 
-    profiles = {}
-    for prof in params['profiles']:
-        profiles[prof] = pd.DataFrame(dmgr[prof])
-    boolIndices = dmgr['boolIndices']
-    outputProfiles = []
-
-    for pname, prof in profiles.items():
-        outputProfiles.append(prof.loc[boolIndices['indexCons'], :])
-
-    # datalogger.info(outputProfiles)
-
-    for idx in range(len(params['dmgrNames'])):
-        dmgr[params['dmgrNames'][idx]] = outputProfiles[idx]
+    outputProfile = profile.loc[boolIndices[critCol], :]
+    return(outputProfile)
 
 
+# so far not used. Plug profiles are aggregated in the action aggregateProfiles.
 def considerProfiles(profiles, consider, colStart, colEnd, colCons):
     profilesOut = profiles.copy()
 
@@ -774,9 +732,9 @@ def considerProfiles(profiles, consider, colStart, colEnd, colCons):
             "The key {} is not part of {}".format(colCons, consider))
     return profilesOut
 
-# so far not used. Plug profiles are aggregated in the action aggregateProfiles.
+
 # @action('VencoPy')
-def aggregatePlugProfiles(dmgr, config, params):
+def aggregateProfiles(profilesIn):
     '''
     This action aggregates all single-vehicle profiles that are considered to one fleet profile. There is a separate
     action for the aggregation of plug profiles since it is not corrected by another driving cycle such as consumption
@@ -786,21 +744,19 @@ def aggregatePlugProfiles(dmgr, config, params):
     :return: Writes profile to DataManager under the key 'chargeAvailProfile_out'
     '''
 
-    profiles = dmgr['plugProfilesCons'].copy()
-
     # Typecasting is necessary for aggregation of boolean profiles
-    profiles_out = profiles.iloc[0, :].astype('float64', copy=True)
-    lenProfiles = len(profiles)
+    profilesOut = profilesIn.iloc[0, :].astype('float64', copy=True)
+    lenProfiles = len(profilesIn)
 
-    for colidx in profiles:
-        profiles_out[colidx] = sum(profiles.loc[:, colidx]) / lenProfiles
+    for colidx in profilesIn:
+        profilesOut[colidx] = sum(profilesIn.loc[:, colidx]) / lenProfiles
 
-    dmgr['chargeAvailProfile_out'] = profiles_out
+    return(profilesOut)
     # datalogger.info(profiles_out)
 
 
 # @action('VencoPy')
-def correctProfiles(dmgr, config, params):
+def correctProfiles(scalars, profiles, profType):
     '''
     This action scales given profiles by a correction factor. It was written for VencoPy scaling consumption data
     with the more realistic ARTEMIS driving cycle.
@@ -814,84 +770,71 @@ def correctProfiles(dmgr, config, params):
     :return: Writes the corrected profiles to the DataManager under the keys given in dmgrNames
     '''
 
-    profiles = {}
-    for prof in params['profiles']:
-        profiles[prof] = pd.DataFrame(dmgr[prof])
-    consumptionElectricNEFZ = dmgr['scalars'].loc['Verbrauch NEFZ CD', 'value']
-    consumptionFuelNEFZ = dmgr['scalars'].loc['Verbrauch NEFZ CS', 'value']
-    consumptionElectricArtemis = dmgr['scalars'].loc['Verbrauch Artemis mit NV CD', 'value']
-    consumptionFuelArtemis = dmgr['scalars'].loc['Verbrauch Artemis mit NV CS', 'value']
-    corrFactorElectric = consumptionElectricArtemis / consumptionElectricNEFZ
-    corrFactorFuel = consumptionFuelArtemis / consumptionFuelNEFZ
+    profilesOut = profiles.copy()
+    if profType == 'electric':
+        consumptionElectricNEFZ = scalars.loc['Verbrauch NEFZ CD', 'value']
+        consumptionElectricArtemis = scalars.loc['Verbrauch Artemis mit NV CD', 'value']
+        corrFactor = consumptionElectricArtemis / consumptionElectricNEFZ
 
-    profiles_corr = []
+    elif profType == 'fuel':
+        consumptionFuelNEFZ = scalars.loc['Verbrauch NEFZ CS', 'value']
+        consumptionFuelArtemis = scalars.loc['Verbrauch Artemis mit NV CS', 'value']
+        corrFactor = consumptionFuelArtemis / consumptionFuelNEFZ
 
-    for idx, key in enumerate(profiles):
-        # print(idx)
-        # print(profiles[key].head())
+    else:
+        print('Either parameter "profType" is not given or not assigned to either "electric" or "fuel".')
 
-        profiles_loop = profiles[key].copy()
+    for colIdx in profiles.index:
+        profilesOut[colIdx] = corrFactor * profiles[colIdx]
 
-        if params['profType'][idx] == 'electric':
-                for colidx in profiles[key]:
-                    profiles_loop[colidx] = corrFactorElectric * profiles[key][colidx]
-
-        elif params['profType'][idx] == 'fuel':
-                for colidx in profiles[key]:
-                    profiles_loop[colidx] = corrFactorFuel * profiles[key][colidx]
-        else:
-            print('Either parameter "profType" is not given or not assigned to either "electric" or "fuel".')
-
-        # print(profiles_loop)
-        profiles_corr.append(profiles_loop)
-
-    # datalogger.info(profiles_corr)
-    for idx in range(len(params['dmgrNames'])):
-        dmgr[params['dmgrNames'][idx]] = profiles_corr[idx]
+    return(profilesOut)
 
 
+
+
+##### DEPRECATED? ######
 # @action('VencoPy')
-def aggregateProfiles(dmgr, config, params):
-
-    # TODO: Set column name to pname or use list instead of dataframe as looping data type
-    '''
-    This action aggregates profiles based on building the arithmetic mean for each hour. It thus transforms
-    single-vehicle profiles to one fleet profile per profile type.
-
-    :param profiles: List of strings of DataManager keys referencing to profiles for aggregation.
-    :param dmgrNames: List of strings that results get written to.
-
-    :return: Writes aggregated profiles to DataManager under the keys specified in dmgrNames.
-    '''
-
-    profiles = {}
-    for prof in params['profiles']:
-        profiles[prof] = pd.DataFrame(dmgr[prof])
-
-    profiles_out = []
-    for pname, prof in profiles.items():
-        # initiating looping dataframe
-        profiles_loop = pd.DataFrame(data = profiles[next(iter(profiles))].iloc[0, :],
-                                        dtype = float,
-                                        copy = True)
-        profiles_loop.columns = [pname] # renaming the 1-column DataFrame
-        noProfiles = len(prof)
-
-        # aggregation
-        for colidx in prof:  # colidx: column index
-            # profiles_loop.iloc[int(colidx), :] = sum(prof.loc[:, colidx]) / len(prof.loc[:, colidx])
-            profiles_loop.iloc[int(colidx), :] = sum(prof.loc[:, colidx]) / noProfiles
-
-        profiles_out.append(profiles_loop)
-
-    # Write profiles to datamanager for given profile names
-    for idx in range(len(params['dmgrNames'])):
-        dmgr[params['dmgrNames'][idx]] = profiles_out[idx]
+# def aggregateProfiles(dmgr, config, params):
+#
+#     # TODO: Set column name to pname or use list instead of dataframe as looping data type
+#     '''
+#     This action aggregates profiles based on building the arithmetic mean for each hour. It thus transforms
+#     single-vehicle profiles to one fleet profile per profile type.
+#
+#     :param profiles: List of strings of DataManager keys referencing to profiles for aggregation.
+#     :param dmgrNames: List of strings that results get written to.
+#
+#     :return: Writes aggregated profiles to DataManager under the keys specified in dmgrNames.
+#     '''
+#
+#     profiles = {}
+#     for prof in params['profiles']:
+#         profiles[prof] = pd.DataFrame(dmgr[prof])
+#
+#     profiles_out = []
+#     for pname, prof in profiles.items():
+#         # initiating looping dataframe
+#         profiles_loop = pd.DataFrame(data = profiles[next(iter(profiles))].iloc[0, :],
+#                                         dtype = float,
+#                                         copy = True)
+#         profiles_loop.columns = [pname] # renaming the 1-column DataFrame
+#         noProfiles = len(prof)
+#
+#         # aggregation
+#         for colidx in prof:  # colidx: column index
+#             # profiles_loop.iloc[int(colidx), :] = sum(prof.loc[:, colidx]) / len(prof.loc[:, colidx])
+#             profiles_loop.iloc[int(colidx), :] = sum(prof.loc[:, colidx]) / noProfiles
+#
+#         profiles_out.append(profiles_loop)
+#
+#     # Write profiles to datamanager for given profile names
+#     for idx in range(len(params['dmgrNames'])):
+#         dmgr[params['dmgrNames'][idx]] = profiles_out[idx]
 
 # -----OUTPUT PROCESSING-------------------------------------------------------
 
 # @action('VencoPy')
-def cloneProfilesToYear(dmgr, config, params):
+def cloneProfilesToYear(profile, linkDict, noOfHoursOutput, technologyLabel, filename):
     '''
     This action clones daily profiles to cover a whole year.
 
@@ -901,27 +844,82 @@ def cloneProfilesToYear(dmgr, config, params):
     :return: Writes the data to the specified REMix directory
     '''
 
-    # read profiles from dmgr given in action call
-    profiles = {}
-    for prof in params['profiles']:
-        profiles[prof] = pd.DataFrame(dmgr[prof]).iloc[:, 0]
-    # datalogger.info(profiles)
-
-    # tech = params['technologies']
-    # nodes = params['nodes']
+    dfProfile = pd.DataFrame(profile).iloc[:, 0]
 
     # initialize config
-    cfg = yaml.load(open(dmgr['linkDict']['linkTSConfig']))
-    linkRmx = dmgr['linkDict']['linkTSREMix']
+    cfg = yaml.load(open(linkDict['linkTSConfig']))
+    linkRmx = linkDict['linkTSREMix']
 
     # df = pd.DataFrame(columns=['technologies', 'timestep', nodes])
     # df = df.set_index(['technologies', 'timestep'])
 
-    df = pd.concat([pd.DataFrame([i], columns=['']) for i in range(1, 8761)], ignore_index=True)
-    df[' '] = params['technology_label']  # Add technology column
+    # df = pd.concat([pd.DataFrame([i], columns=['']) for i in range(1, 8761)], ignore_index=True)
+    # df[' '] = technologyLabel  # Add technology column
+    # df = df[[' ', '']]  # Re-arrange columns order
+    #
+    # for i in cfg['Nodes']:
+    #     df[i] = 0
+    #
+    # s = df[''] < 10
+    # s1 = (df[''] >= 10) & (df[''] < 100)
+    # s2 = (df[''] >= 100) & (df[''] < 1000)
+    # s3 = df[''] >= 1000
+    #
+    # df.loc[s, ''] = df.loc[s, ''].apply(lambda x: "{}{}".format('t000', x))
+    # df.loc[s1, ''] = df.loc[s1, ''].apply(lambda x: "{}{}".format('t00', x))
+    # df.loc[s2, ''] = df.loc[s2, ''].apply(lambda x: "{}{}".format('t0', x))
+    # df.loc[s3, ''] = df.loc[s3, ''].apply(lambda x: "{}{}".format('t', x))
+
+    df = createEmptyDataFrame(technologyLabel, noOfHoursOutput, cfg['Nodes'])
+    noOfClones = noOfHoursOutput / len(profile) - 1
+
+    # for name, prof in profiles.items():
+    #     profiles[name] = prof.append([prof] * 364, ignore_index=True)
+
+    profileCloned = profile.append([profile] * int(noOfClones), ignore_index=True)
+
+    if len(profileCloned) < noOfHoursOutput:
+        subHours = noOfHoursOutput - len(profileCloned)
+        profileCloned = profileCloned.append(profile[range(subHours)], ignore_index=True)
+
+    # print(profiles)
+
+    profilesOut = df.copy()
+    # df_chargeAv = df.copy()
+    # df_BatMax = df.copy()
+    # df_BatMin = df.copy()
+    # df_DrivePow = df.copy()
+    # df_UncontrCharge = df.copy()
+
+    for i in cfg['NonNullNodes']:
+        profilesOut.loc[:, i] = np.round(profileCloned, 3)
+        # df_chargeAv[i] = np.round(profiles['plugProfilesCons_out'] , 3)
+        # df_BatMax.loc[:, i] = np.round(profiles['SOCMax_out'], 3)
+        # df_BatMin.loc[:, i] = np.round(profiles['SOCMin_out'], 3)
+        # df_DrivePow.loc[:, i] = np.round(profiles['electricPowerProfiles_out'], 3)
+        # df_UncontrCharge.loc[:, i] = np.round(profiles['chargeProfilesUncontrolled_out'], 3)
+
+    # datalogger.info(df_chargeAv)
+
+    profilesOut.to_csv(linkRmx + '/' + filename + '.csv', index=False)
+    # df_chargeAv.to_csv(linkRmx + '/' + params['outputStrPre'] + 'chargeAvail' + params['outputStrPost'] + '.csv',
+    #                    index=False)
+    # df_BatMax.to_csv(linkRmx + '/' + params['outputStrPre'] + 'batMax' + params['outputStrPost'] + '.csv',
+    #                  index=False)
+    # df_BatMin.to_csv(linkRmx + '/' + params['outputStrPre'] + 'batMin' + params['outputStrPost'] + '.csv',
+    #                  index=False)
+    # df_DrivePow.to_csv(linkRmx + '/' + params['outputStrPre'] + 'drivePower' + params['outputStrPost'] + '.csv',
+    #                    index=False)
+    # df_UncontrCharge.to_csv(linkRmx + '/' + params['outputStrPre'] + 'uncontrCharge' + params['outputStrPost'] + '.csv',
+    #                         index=False)
+
+
+def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
+    df = pd.concat([pd.DataFrame([i], columns=['']) for i in range(1, numberOfHours + 1)], ignore_index=True)
+    df[' '] = technologyLabel  # Add technology column
     df = df[[' ', '']]  # Re-arrange columns order
 
-    for i in cfg['Nodes']:
+    for i in nodes:
         df[i] = 0
 
     s = df[''] < 10
@@ -934,42 +932,7 @@ def cloneProfilesToYear(dmgr, config, params):
     df.loc[s2, ''] = df.loc[s2, ''].apply(lambda x: "{}{}".format('t0', x))
     df.loc[s3, ''] = df.loc[s3, ''].apply(lambda x: "{}{}".format('t', x))
 
-    for name, prof in profiles.items():
-        profiles[name] = prof.append([prof] * 364, ignore_index=True)
-
-    # print(profiles)
-
-    df_chargeAv = df.copy()
-    df_BatMax = df.copy()
-    df_BatMin = df.copy()
-    df_DrivePow = df.copy()
-    df_UncontrCharge = df.copy()
-
-    for i in cfg['NonNullNodes']:
-        df_chargeAv[i] = np.round(profiles['plugProfilesCons_out'] , 3)
-        df_BatMax.loc[:, i] = np.round(profiles['SOCMax_out'], 3)
-        df_BatMin.loc[:, i] = np.round(profiles['SOCMin_out'], 3)
-        df_DrivePow.loc[:, i] = np.round(profiles['electricPowerProfiles_out'], 3)
-        df_UncontrCharge.loc[:, i] = np.round(profiles['chargeProfilesUncontrolled_out'], 3)
-
-    # datalogger.info(df_chargeAv)
-
-    df_chargeAv.to_csv(linkRmx + '/' + params['outputStrPre'] + 'chargeAvail' + params['outputStrPost'] + '.csv',
-                       index=False)
-    df_BatMax.to_csv(linkRmx + '/' + params['outputStrPre'] + 'batMax' + params['outputStrPost'] + '.csv',
-                     index=False)
-    df_BatMin.to_csv(linkRmx + '/' + params['outputStrPre'] + 'batMin' + params['outputStrPost'] + '.csv',
-                     index=False)
-    df_DrivePow.to_csv(linkRmx + '/' + params['outputStrPre'] + 'drivePower' + params['outputStrPost'] + '.csv',
-                       index=False)
-    df_UncontrCharge.to_csv(linkRmx + '/' + params['outputStrPre'] + 'uncontrCharge' + params['outputStrPost'] + '.csv',
-                            index=False)
-
-    # dmgr['chargeAv'] = df_chargeAv
-    # dmgr['batMax'] = df_BatMax
-    # dmgr['batMin'] = df_BatMin
-    # dmgr['drivePower'] = df_DrivePow
-    # dmgr['uncCharge'] = df_UncontrCharge
+    return(df)
 
 
 # @action('VencoPy')
