@@ -13,16 +13,13 @@ import sys
 
 sys.path.append(os.path.abspath('C:/REMix-OaM/OptiMo/projects/REMix-tools/remixPlotting'))
 
-from ioproc.tools import action
-from ioproc.logger import mainlogger, datalogger
-from plotsStochastic import plotStochBox
 import numpy as np
 import yaml
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import reportlab as repl
-from reportlab.pdfgen import canvas
+# import reportlab as repl
+# from reportlab.pdfgen import canvas
 from functools import reduce
 from random import seed
 from random import random
@@ -63,7 +60,7 @@ def getStatisticalInfo(data, column):
 # So far it's only possible to write explicit strings to the PDF using Reportlab. Possibly, flowables or tables
 # (chapters 7 + 8 in the guide) could be used to write tabular data such as the header of the input profiles
 # or df.describe() directly.
-@action('VencoPy')
+
 def plotting(dmgr, config, params):
     canvasPlots = canvas.Canvas(dmgr['linkDict']['linkPlots'] + params['data'] + '.pdf')
     for y in params['y']:
@@ -88,7 +85,6 @@ def plotting(dmgr, config, params):
     canvasPlots.save()
 
 
-@action('VencoPy')
 def violinplot(dmgr, config, params):
     dataRaw = dmgr[params['data']]
 
@@ -128,7 +124,6 @@ def violinplot(dmgr, config, params):
         plt.show()
 
 
-@action('VencoPy')
 def linePlot(dmgr, config, params):
     '''
     This action takes in x profiles, orders them into a x-column DataFrame and plots them in x line plots.

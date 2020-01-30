@@ -4,7 +4,7 @@ __version__ = '0.1.0'
 __maintainer__ = 'Niklas Wulff 16.04.2019'
 __email__ = 'Niklas.Wulff@dlr.de'
 __birthdate__ = '15.04.2019'
-__status__ = 'dev'  # options are: dev, test, prod
+__status__ = 'test'  # options are: dev, test, prod
 
 # This script holds the function definitions and actions for VencoPy.
 # df = dataframe, dmgr = data manager,
@@ -37,9 +37,12 @@ class VencoError(Exception):
 # -----INPUT-----------------------------------
 
 def readVencoConfig(cfgLink):
-    config = yaml.load(open(cfgLink))
+    config = yaml.load(open(cfgLink), Loader=yaml.SafeLoader)
     # print(config)
     return (config)
+
+
+
 
 def initializeLinkMgr(vencoConfig):     # allocate explicit types to documentation, dict = manager
     linkDict_out = {'linkScalars': vencoConfig['linksAbsolute']['inputData'] + vencoConfig['files']['inputDataScalars'],

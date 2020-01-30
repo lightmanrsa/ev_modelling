@@ -233,22 +233,22 @@ driveProfilesFuelAuxCorr = correctProfiles(scalars, driveProfilesFuelAuxAgg, 'fu
 #                  'electricPowerProfiles_out', 'driveProfilesFuelAux_out']
 
 cloneProfilesToYear(socMinNorm, linkDict, 8760, technologyLabel='BEV-S',
-                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+                    filename='BEV_S_SOCMin_VencoPy_MR1_alpha1_batCap40_cons15')
 
 cloneProfilesToYear(socMaxNorm, linkDict, 8760, technologyLabel='BEV-S',
                     filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
 
 cloneProfilesToYear(chargeProfilesUncontrolledCorr, linkDict, 8760, technologyLabel='BEV-S',
-                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+                    filename='BEV_S_chargeUncontrolled_VencoPy_MR1_alpha1_batCap40_cons15')
 
 cloneProfilesToYear(electricPowerProfilesCorr, linkDict, 8760, technologyLabel='BEV-S',
-                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+                    filename='BEV_S_drivePower_VencoPy_MR1_alpha1_batCap40_cons15')
 
 cloneProfilesToYear(driveProfilesFuelAuxCorr, linkDict, 8760, technologyLabel='BEV-S',
-                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+                    filename='BEV_S_driveAuxFuel_VencoPy_MR1_alpha1_batCap40_cons15')
 
 cloneProfilesToYear(plugProfilesAgg, linkDict, 8760, technologyLabel='BEV-S',
-                    filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
+                    filename='BEV_S_plugProfile_VencoPy_MR1_alpha1_batCap40_cons15')
 
 
 
@@ -263,7 +263,7 @@ cloneProfilesToYear(plugProfilesAgg, linkDict, 8760, technologyLabel='BEV-S',
 #      outputStrPre: BEV-S_
 #      outputStrPost: _Venco_MR1_alpha1_batCap40_cons15
 
-
+linePlot(profiles, show=True, write=True, stradd='MR1_alpha1_batCap40_cons15')
 
 #  - plottingAction1:
 #      project: VencoPy
