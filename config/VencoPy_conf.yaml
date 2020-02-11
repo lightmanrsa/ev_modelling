@@ -20,6 +20,7 @@ linksRelative:
     config: ./config/
     tsConfig: ./config/timeseriesREMix.yaml
 
+# During first configuartion, please fill in absolute links on your system
 linksAbsolute:
     inputData: C:/vencopy_repo/inputData/
     REMixTimeseriesPath: C:/vencopy_repo/output/annualTimeseries/
