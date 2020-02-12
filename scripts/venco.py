@@ -22,7 +22,7 @@ from functools import reduce
 from random import seed
 from random import random
 
-
+# review: general remark for publication: can we rename scripts into tools or libs? It is not really a script what is saved in this folder and seems a bit missleading
 
 # shutil: Link library
 # pathlib: Objectoriented path mannipulation
@@ -34,9 +34,11 @@ from random import random
 # ToDo: Explicit strings from current Excel file in the code. Is it possible to implement that better???
 
 # -----INPUT-----------------------------------
+# review have you considered splitting this file up into different files, named after the captions in this file? It would make it easier to navigate and search the code base
 
 def readVencoConfig(cfgLink):
     config = yaml.load(open(cfgLink), Loader=yaml.SafeLoader)
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return (config)
 
 def initializeLinkMgr(vencoConfig):
@@ -49,31 +51,37 @@ def initializeLinkMgr(vencoConfig):
                     'linkTSREMix': vencoConfig['linksAbsolute']['REMixTimeseriesPath'],
                     'linkPlots': vencoConfig['linksRelative']['plots'],
                     'linkOutput': vencoConfig['linksAbsolute']['OutputPath']}
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return (linkDict_out)
 
 def readInputScalar(fileLink):
+    # review general remark, a file link implies a sym link on the disk. Have you considered renaming the variable to filePath for example, which would imply a path to a file on the disk
     input_raw = pd.read_excel(fileLink,
                               header=5,
                               usecols="A:E",
                               skiprows=0)
     df_scalar = input_raw.loc[:, ~input_raw.columns.str.match('Unnamed')]
     df_out = df_scalar.set_index('parameter')
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return (df_out)
 
 def readInputCSV(file_link):
     input_raw = pd.read_csv(file_link, header=4)
     df_out = input_raw.loc[:, ~input_raw.columns.str.match('Unnamed')]
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return (df_out)
 
 def stringToBoolean(df):
     dict_bol = {'WAHR': True,
                 'FALSCH': False}
     df_out = df.replace(to_replace=dict_bol, value=None)
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return (df_out)
 
 def readInputBoolean(file_link):
     input_raw = readInputCSV(file_link)
     df_out = stringToBoolean(input_raw)
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return (df_out)
 
 def readVencoInput(linkConfig):
@@ -93,6 +101,7 @@ def readVencoInput(linkConfig):
     linkDict = initializeLinkMgr(readVencoConfig(linkConfig))
     # dmgr['linkDict'] = linkDict
 
+    # review: have you considered using the logging module for these kind of outputs?
     print('Reading Venco input scalars, drive profiles and boolean plug profiles')
 
     scalars = readInputScalar(linkDict['linkScalars'])
@@ -124,6 +133,7 @@ def indexProfile(driveProfiles_raw, plugProfiles_raw, indices):
 
     driveProfile = driveProfiles_raw.set_index(list(indices))
     plugProfile = plugProfiles_raw.set_index(list(indices))
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return (driveProfile, plugProfile)
 
 def procScalars(driveProfiles_raw, plugProfiles_raw, driveProfiles, plugProfiles):
@@ -151,6 +161,7 @@ def procScalars(driveProfiles_raw, plugProfiles_raw, driveProfiles, plugProfiles
         warnings.warn('Length of drive and plug input data differ! This will at the latest crash in calculating '
                       'profiles for SoC max')
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(scalarsProc)
 
 # -----CALCULATION OF PROFILES-------------------------------------------------------
@@ -167,7 +178,11 @@ def calcConsumptionProfile(driveProfiles, scalars):
     '''
 
     consumptionProfiles = driveProfiles.copy()
+    # review have you considered the pandas .astype() method? It is more performant than a direct float type cast.
+    # review the division by int 100 can be changed to float 100. which would force python above 2.7 to use float division and thus a typecast might not even be necessary
     consumptionProfiles = consumptionProfiles * float(scalars.loc['Verbrauch NEFZ CD', 'value']) / 100
+
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(consumptionProfiles)
 
 
@@ -181,7 +196,10 @@ def calcChargeProfile(plugProfiles, scalars):
     '''
 
     chargeProfiles = plugProfiles.copy()
+    # review have you considered the pandas .astype() method? It is more performant than a direct float type cast.
     chargeProfiles = chargeProfiles * float(scalars.loc['Panschluss', 'value'])
+
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(chargeProfiles)
 
 
@@ -234,11 +252,15 @@ def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsP
                 chargeMaxProfiles[str(idx)] = np.where(chargeMaxProfiles[str(idx)] >= batCapMin,
                                                       chargeMaxProfiles[str(idx)],
                                                       batCapMin)
+
+        # review: general remark instead of str(0) which is a performance heavy operation, one could write "0" which is equivalent and less performance heavy (performance impact is however negligible I guess)
         devCrit = chargeMaxProfiles[str(nHours - 1)].sum() - chargeMaxProfiles[str(0)].sum()
         print(devCrit)
         idxIt += 1
 
     chargeMaxProfiles.drop(labels='newCharge', axis='columns', inplace=True)
+
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(chargeMaxProfiles)
 
 
@@ -279,6 +301,7 @@ def calcChargeProfileUncontrolled(chargeMaxProfiles, scalarsProc):
     chargeProfilesUncontrolled[str(0)] = \
         (chargeProfilesUncontrolled[str(1)] + chargeProfilesUncontrolled[str(nHours - 1)])/2
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(chargeProfilesUncontrolled)
     # datalogger.info(chargeProfilesUncontrolled)
 
@@ -294,13 +317,18 @@ def calcDriveProfilesFuelAux(chargeMaxProfiles, chargeProfilesUncontrolled, driv
     completely be fulfilled with electric driving under the given consumption and battery size assumptions.
 
     '''
+
+    # review: the hardcoding of the column names can cause a lot of problems for people later on if we do not ship the date with the tool. I would recommend to move these column names to a config file similar to i18n strategies
     consumptionPower = scalars.loc['Verbrauch NEFZ CD', 'value']
     consumptionFuel = scalars.loc['Verbrauch NEFZ CS', 'value']
 
     # initialize data set for filling up later on
     driveProfilesFuelAux = chargeMaxProfiles.copy()
     nHours = scalarsProc['noHours']
+
+    # review: have you considered naming idx into ihour as it actually contains the currently processed hour and would make the code more readable
     for idx in range(nHours):
+        # review as far as I can tell, the hour 0 is never filled or added as a column to driveProfilesFuelAux. But this should raise an error in line 336 for idx 1. Why does this work anyhow?
         if idx != 0:
             driveProfilesFuelAux[str(idx)] = (consumptionFuel / consumptionPower) * \
                                              (driveProfiles[str(idx)] * consumptionPower / 100 -
@@ -309,6 +337,8 @@ def calcDriveProfilesFuelAux(chargeMaxProfiles, chargeProfilesUncontrolled, driv
     # Setting value of hour=0 equal to the average of hour=1 and last hour
     driveProfilesFuelAux[str(0)] = (driveProfilesFuelAux[str(nHours - 1)] + driveProfilesFuelAux[str(1)])/2
     driveProfilesFuelAux = driveProfilesFuelAux.round(4)
+
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(driveProfilesFuelAux)
 
 
@@ -332,6 +362,8 @@ def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuel
     format as chargeProfiles, consumptionProfiles and other input parameters.
 
     '''
+
+    # review general remark: white spaces in column names give me the creeps as it is easy to mistype and create all kind of wired errors. Especially if there are columns with similar names only differing in whitespaces. This is clearly not the case here, but did you consider naming columns with underscores for easier reference?
     chargeMinProfiles = chargeProfiles.copy()
     batCapMin = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmin', 'value']
     batCapMax = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmax', 'value']
@@ -345,6 +377,8 @@ def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuel
 
             # testing line
             # chargeMinProfiles.ix[3, '0'] = 15.0
+
+            # review the above nHours implies, that the number of hours can vary based on user input or the underlying data. It seems to me risky to hardcode 23 here if the last hour is meant. Would it not be more prudent to use a variable lastHour that is nHours-1?
             if idx == 23:
                 chargeMinProfiles[str(idx)] = np.where(batCapMin <= chargeMinProfiles[str(idx)],
                                                        chargeMinProfiles[str(0)],
@@ -375,11 +409,14 @@ def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuel
     # print(chargeMinProfiles.ix[np.isin(chargeMinProfiles['CASEID'], caseids), :nHours + 2], flush=True)
 
     chargeMinProfiles.drop('newCharge', axis='columns', inplace=True)
+
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(chargeMinProfiles)
     # datalogger.info(chargeMinProfiles)
 
 
 def createRandNo(driveProfiles, setSeed=1):
+    # review for me the function name is not precise. The function creates to my understanding a random profile. If this is the case, I would name it accordingly.
     '''
     Creates a random number between 0 and 1 for each profile based on driving profiles.
 
@@ -395,6 +432,7 @@ def createRandNo(driveProfiles, setSeed=1):
     idxData['randNo'] = [random() for _ in range(len(idxData))]  # generate one random number for each profile / index
     randNos = idxData.loc[:, 'randNo']
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(randNos)
 
 
@@ -453,6 +491,7 @@ def calcIndices(chargeProfiles,
                     str(sum(filterCons['indexDSM'])) + ' DSM eligible profiles.')
     filterCons_out = filterCons.loc[:, ['randNo', 'indexCons', 'indexDSM']]
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(filterCons_out)
 
     # Debugging and Checking
@@ -500,6 +539,7 @@ def calcElectricPowerProfiles(consumptionProfiles, driveProfilesFuelAux, scalars
         elif filterIndex == 'indexDSM':
             electricPowerProfiles[str(idx)] = electricPowerProfiles[str(idx)] * indexDSM
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(electricPowerProfiles)
     # datalogger.info(electricPowerProfiles)
 
@@ -527,6 +567,7 @@ def filterConsBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons, minV
         print("Declaration doesn't work. "
               "Maybe the length of filterCons differs from the length of chargeMaxProfiles")
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(chargeMaxProfilesDSM, chargeMinProfilesDSM)
 
     # datalogger.info(len(chargeMaxProfilesDSM))
@@ -553,6 +594,7 @@ def indexFilter(chargeMaxProfiles, chargeMinProfiles, filterCons):
     profilesFilterDSMMin = chargeMinProfiles.loc[filterCons['indexDSM'], :]
     profilesFilterDSMMax = chargeMinProfiles.loc[filterCons['indexDSM'], :]
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(profilesFilterConsMin, profilesFilterConsMax, profilesFilterDSMMin, profilesFilterDSMMax)
 
 
@@ -586,8 +628,10 @@ def socProfileSelection(profilesMin, profilesMax, filter, alpha):
         # ToDo: Profile specific filtering
 
     else:
+        # review have you considered implementing your own error like class FilterError(Exception): pass which would give the user an additional hint on what went wrong?
         raise ValueError('You selected a filter method that is not implemented.')
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(profileMinOut, profileMaxOut)
 
 
@@ -613,8 +657,11 @@ def normalizeProfiles(scalars, socMin, socMax, normReference):
         socMaxNorm = socMax.div(float(normReference))
 
     except ValueError:
+        # review general if " is used instead of ' the escaping of \' is not necessary
+        # review general so is this not a problem at all if this happens? As I understand this code, socMin and socMax would be unchanged by this function call
         print('There was a value error. I don\'t know what to tell you.')
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(socMinNorm, socMaxNorm)
     # datalogger.info(outputProfiles)
 
@@ -628,7 +675,10 @@ def filterConsProfiles(profile, filterCons, critCol):
     :return: Stores filtered profiles in the DataManager under keys given in dmgrNames
     '''
 
+    # review general could the filterCons and critCol not be hardcoded or sotred in a hidden data structure, so that it has not to be passed directly between functions? A class could achieve this goal easily (providing a hidden data structure in the shape of an attribute) making the code more structured?
     outputProfile = profile.loc[filterCons[critCol], :]
+
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(outputProfile)
 
 
@@ -639,6 +689,7 @@ def considerProfiles(profiles, consider, colStart, colEnd, colCons):
     try:
             profilesOut = profiles[consider[colCons].astype('bool'), colStart: colEnd]
     except KeyError:
+        # review general: these are silent fails. How should the user react? Can this create a data problem downstream? Is this invalidating your results or is this nothing to bother at all? It is not clear from the error message. Also key is a bit unclear in this context.
         print("Key Error. "
             "The key {} is not part of {}".format(colCons, consider))
     return profilesOut
@@ -658,9 +709,11 @@ def aggregateProfiles(profilesIn):
     profilesOut = profilesIn.iloc[0, :].astype('float64', copy=True)
     lenProfiles = len(profilesIn)
 
+    # review have you considered using pandas dataframe .T to transpose, use sum to get the sum of each column and then divide by lenProfiles? This would be more concise in writing and more performant than a python loop
     for colidx in profilesIn:
         profilesOut[colidx] = sum(profilesIn.loc[:, colidx]) / lenProfiles
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(profilesOut)
     # datalogger.info(profiles_out)
 
@@ -691,11 +744,15 @@ def correctProfiles(scalars, profiles, profType):
         corrFactor = consumptionFuelArtemis / consumptionFuelNEFZ
 
     else:
+        # review I expect raising an exception here. Would it not be a problem if the processing continues silently?
         print('Either parameter "profType" is not given or not assigned to either "electric" or "fuel".')
 
+    # review same like above:
+    # review have you considered using pandas dataframe .T to transpose, use sum to get the sum of each column and then divide by lenProfiles? This would be more concise in writing and more performant than a python loop
     for colIdx in profiles.index:
         profilesOut[colIdx] = corrFactor * profiles[colIdx]
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(profilesOut)
 
 
@@ -780,11 +837,13 @@ def cloneProfilesToYear(profile, linkDict, noOfHoursOutput, technologyLabel, fil
     # df.loc[s3, ''] = df.loc[s3, ''].apply(lambda x: "{}{}".format('t', x))
 
     df = createEmptyDataFrame(technologyLabel, noOfHoursOutput, cfg['Nodes'])
+    # review is this correct? What happens when noOfHoursOutput/len(profile) is smaller then 0? Then noOfClones would be negative and I am not sure if this would be coerced to 0 by the following int type cast later on. Is this handled upstream in the call chain?
     noOfClones = noOfHoursOutput / len(profile) - 1
 
     # for name, prof in profiles.items():
     #     profiles[name] = prof.append([prof] * 364, ignore_index=True)
 
+    # review the int type cast could have a nasty side effect, as it is behaving like a floor operation for the float division above. Is this intended?
     profileCloned = profile.append([profile] * int(noOfClones), ignore_index=True)
 
     if len(profileCloned) < noOfHoursOutput:
@@ -793,6 +852,7 @@ def cloneProfilesToYear(profile, linkDict, noOfHoursOutput, technologyLabel, fil
 
     # print(profiles)
 
+    # review this .copy() seems to be redundant if createEmptyDataFrame above indeed creates a fresh new empty dataframe. Am I missing something here?
     profilesOut = df.copy()
     # df_chargeAv = df.copy()
     # df_BatMax = df.copy()
@@ -828,6 +888,7 @@ def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
     df[' '] = technologyLabel  # Add technology column
     df = df[[' ', '']]  # Re-arrange columns order
 
+    # review if nodes is a list of column labels then one could also write it like this: df[nodes] = 0 instead of the explicit loop. I am not 100% sure of the syntax but there is a way to write this without a loop. Should be detailed in pandas indexing docu
     for i in nodes:
         df[i] = 0
 
@@ -836,11 +897,15 @@ def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
     s2 = (df[''] >= 100) & (df[''] < 1000)
     s3 = df[''] >= 1000
 
+    # review: there exists the python string formatting mini language which provides padding of strings (also leading). see here: https://docs.python.org/3.4/library/string.html#format-specification-mini-language
+    #  I think with a format string of the shape 't'+'{0:0<4.0d}'.format(x) would result for all four lines below in the correct output. Then also lines 894 to 897 would be superfluous.
+
     df.loc[s, ''] = df.loc[s, ''].apply(lambda x: "{}{}".format('t000', x))
     df.loc[s1, ''] = df.loc[s1, ''].apply(lambda x: "{}{}".format('t00', x))
     df.loc[s2, ''] = df.loc[s2, ''].apply(lambda x: "{}{}".format('t0', x))
     df.loc[s3, ''] = df.loc[s3, ''].apply(lambda x: "{}{}".format('t', x))
 
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(df)
 
 
@@ -864,7 +929,6 @@ def writeProfilesToCSV(dmgr, config, params):
 
     if params['outputFormat'] == 'singleFile':
         data_df.to_csv(dmgr['linkDict']['linkOutput'] + 'vencoOutput_' + params['stradd'] + '.csv')
-
     elif params['outputFormat' == 'multiFile']:
         for iprof in params['dmgrKeys']:
             prof = dmgr[iprof]
@@ -880,6 +944,7 @@ def appendOutputProfiles(dmgr, config, params):
     :return:
     """
     strDict = composeStringDict(params['pre'], params['names'], params['post'])
+    # review general these kind of prints can distract the user if the code is published, as there is no context to hint on what is displayed and why. Would it make sense to provide additional information or to remove it entirely?
     print(strDict)
     dataDict = {}
     for key, strList in strDict.items():
@@ -902,12 +967,15 @@ def appendOutputProfiles(dmgr, config, params):
 
 def composeStringDict(pre, name, post):
     dict = {}
+    # review name implies a single string name or alike, however the loop implies it to be a list of names. Would it be more precise if name would be renamed into names?
     for nIdx in name:
         listStr = []
         for preIdx, postIdx in zip(pre, post):
             str = preIdx + nIdx + postIdx + '.csv'
             listStr.append(str)
         dict[nIdx] = listStr
+
+    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return(dict)
 
 

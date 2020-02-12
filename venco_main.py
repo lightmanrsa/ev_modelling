@@ -21,7 +21,9 @@ from scripts.plotting import *
 
 if __name__ == '__main__':
     #----- data and config read-in -----
+    # REVIEW this should be a relative path as an absolute will not work on other peoples computers. Have you considered to use the pathlib
     linkConfig = 'C:/vencopy_repo/config/VencoPy_conf.yaml'
+    # REVIEW the variable names both use camel case and snake case. I suggest sticking with one for the publication, as this can be irritating when reading the code
     linkDict, scalars, driveProfiles_raw, plugProfiles_raw = readVencoInput(linkConfig)
 
     indices = ['CASEID', 'PKWID']
@@ -29,8 +31,10 @@ if __name__ == '__main__':
 
     scalarsProc = procScalars(driveProfiles_raw, plugProfiles_raw, driveProfiles, plugProfiles)
 
+    # REVIEW the return value of the function implies multiple profiles while the function name implies only one is calculated. I suggest changing the naming to reflect the real situation
     consumptionProfiles = calcConsumptionProfile(driveProfiles, scalars)
 
+    # REVIEW the return value of the function implies multiple profiles while the function name implies only one is calculated. I suggest changing the naming to reflect the real situation
     chargeProfiles = calcChargeProfile(plugProfiles, scalars)
 
     chargeMaxProfiles = calcChargeMaxProfiles(chargeProfiles,
@@ -55,8 +59,10 @@ if __name__ == '__main__':
                                               scalarsProc,
                                               nIter=20)
 
+    # Review randNos is not telling a lot about what the variable contains. It implies for me, that there are random numbers stored into this variable. Can this variable named more precisely
     randNos = createRandNo(driveProfiles)
 
+    # Review naming variables after data types is unusual in Python as it is not a strongly typed language. Can this be named more precisely in the context of the domain?
     boolIndices = calcIndices(chargeProfiles,
                               consumptionProfiles,
                               driveProfiles,
@@ -103,6 +109,7 @@ if __name__ == '__main__':
     electricPowerProfilesCorr = correctProfiles(scalars, electricPowerProfilesAgg, 'electric')
     driveProfilesFuelAuxCorr = correctProfiles(scalars, driveProfilesFuelAuxAgg, 'fuel')
 
+    # review the next calls all seem to write a file to disc, however, the function name itself does not reflect this as cloning usually does not imply a write operation. Could this function be named more precisely?
     cloneProfilesToYear(socMinNorm, linkDict, 8760, technologyLabel='BEV-S',
                         filename='BEV_S_SOCMin_VencoPy_MR1_alpha1_batCap40_cons15')
 
