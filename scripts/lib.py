@@ -115,8 +115,8 @@ def readVencoInput(linkConfig):
 
 
     # dmgr['scalars'] = scalars
-    # dmgr['driveProfiles_raw'] = driveProfiles_raw
-    # dmgr['plugProfiles_raw'] = plugProfiles_raw
+    # dmgr['driveProfilesRaw'] = driveProfilesRaw
+    # dmgr['plugProfilesRaw'] = plugProfilesRaw
 
 
 # -----PRE-PROCESSING---------------------------------
@@ -149,25 +149,21 @@ def procScalars(driveProfiles_raw, plugProfiles_raw, driveProfiles, plugProfiles
     noHoursPlug = len(plugProfiles.columns)
     noDriveProfiles_in = len(driveProfiles_raw)
     noPlugProfiles_in = len(plugProfiles_raw)
-
     scalarsProc = {'noHoursDrive': noHoursDrive,
                    'noHoursPlug': noHoursPlug,
                    'noDriveProfiles_in': noDriveProfiles_in,
                    'noPlugProfiles_in': noPlugProfiles_in}
-
     if noHoursDrive == noHoursPlug:
         scalarsProc['noHours'] = noHoursDrive
     else:
         warnings.warn('Length of drive and plug input data differ! This will at the latest crash in calculating '
                       'profiles for SoC max')
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(scalarsProc)
+    return scalarsProc
 
 # -----CALCULATION OF PROFILES-------------------------------------------------------
 
 
-def calcConsumptionProfile(driveProfiles, scalars):
+def calcConsumptionProfiles(driveProfiles, scalars):
     '''
     Calculates electrical consumption profiles from drive profiles assuming specific consumption (in kWh/100 km)
     given in scalar input data file.
@@ -181,12 +177,10 @@ def calcConsumptionProfile(driveProfiles, scalars):
     # review have you considered the pandas .astype() method? It is more performant than a direct float type cast.
     # review the division by int 100 can be changed to float 100. which would force python above 2.7 to use float division and thus a typecast might not even be necessary
     consumptionProfiles = consumptionProfiles * float(scalars.loc['Verbrauch NEFZ CD', 'value']) / 100
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(consumptionProfiles)
+    return consumptionProfiles
 
 
-def calcChargeProfile(plugProfiles, scalars):
+def calcChargeProfiles(plugProfiles, scalars):
     '''
     Calculates the maximum possible charge power based on the plug profile assuming the charge column power
     given in the scalar input data file (so far under Panschluss).
@@ -198,9 +192,7 @@ def calcChargeProfile(plugProfiles, scalars):
     chargeProfiles = plugProfiles.copy()
     # review have you considered the pandas .astype() method? It is more performant than a direct float type cast.
     chargeProfiles = chargeProfiles * float(scalars.loc['Panschluss', 'value'])
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(chargeProfiles)
+    return chargeProfiles
 
 
 def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsProc, nIter):
@@ -227,7 +219,6 @@ def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsP
     batCapMin = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmin', 'value']
     batCapMax = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmax', 'value']
     nHours = scalarsProc['noHours']
-
     idxIt = 1
     for idxIt in range(nIter):
         # ToDo: np.where() replace by pd.something(),
@@ -257,14 +248,11 @@ def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsP
         devCrit = chargeMaxProfiles[str(nHours - 1)].sum() - chargeMaxProfiles[str(0)].sum()
         print(devCrit)
         idxIt += 1
-
     chargeMaxProfiles.drop(labels='newCharge', axis='columns', inplace=True)
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(chargeMaxProfiles)
+    return chargeMaxProfiles
 
 
-def calcChargeProfileUncontrolled(chargeMaxProfiles, scalarsProc):
+def calcChargeProfilesUncontrolled(chargeMaxProfiles, scalarsProc):
     '''
     Calculates the uncontrolled electric charging based on SoC Max profiles for each hour for each profile.
 
@@ -277,8 +265,6 @@ def calcChargeProfileUncontrolled(chargeMaxProfiles, scalarsProc):
     chargeMaxProfiles = chargeMaxProfiles.copy()
     chargeProfilesUncontrolled = chargeMaxProfiles.copy()
     nHours = scalarsProc['noHours']
-    # ToDo: lastHour
-    # ToDo: erradicate else-statement by indexing -1
 
     for idx in range(nHours):
 
@@ -300,9 +286,7 @@ def calcChargeProfileUncontrolled(chargeMaxProfiles, scalarsProc):
     # because in calcChargeMax iteration the difference is minimized.
     chargeProfilesUncontrolled[str(0)] = \
         (chargeProfilesUncontrolled[str(1)] + chargeProfilesUncontrolled[str(nHours - 1)])/2
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(chargeProfilesUncontrolled)
+    return chargeProfilesUncontrolled
     # datalogger.info(chargeProfilesUncontrolled)
 
 
@@ -337,9 +321,7 @@ def calcDriveProfilesFuelAux(chargeMaxProfiles, chargeProfilesUncontrolled, driv
     # Setting value of hour=0 equal to the average of hour=1 and last hour
     driveProfilesFuelAux[str(0)] = (driveProfilesFuelAux[str(nHours - 1)] + driveProfilesFuelAux[str(1)])/2
     driveProfilesFuelAux = driveProfilesFuelAux.round(4)
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(driveProfilesFuelAux)
+    return driveProfilesFuelAux
 
 
 def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuelAux, scalars, scalarsProc, nIter):
@@ -370,7 +352,6 @@ def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuel
     consElectric = scalars.loc['Verbrauch NEFZ CD', 'value']
     consGasoline = scalars.loc['Verbrauch NEFZ CS', 'value']
     nHours = scalarsProc['noHours']
-
     idxIt = 1
     while idxIt <= nIter:
         for idx in range(nHours):
@@ -401,18 +382,8 @@ def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuel
         devCrit = chargeMinProfiles[str(nHours - 1)].sum() - chargeMinProfiles[str(0)].sum()
         print(devCrit)
         idxIt += 1
-
-    # For validation
-    # pd.set_option('display.max_columns', 30)
-    # pd.set_option('display.width', 500)
-    # caseids = [4803, 84490, 93345, 112106]
-    # print(chargeMinProfiles.ix[np.isin(chargeMinProfiles['CASEID'], caseids), :nHours + 2], flush=True)
-
     chargeMinProfiles.drop('newCharge', axis='columns', inplace=True)
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(chargeMinProfiles)
-    # datalogger.info(chargeMinProfiles)
+    return chargeMinProfiles
 
 
 def createRandNo(driveProfiles, setSeed=1):
@@ -425,26 +396,22 @@ def createRandNo(driveProfiles, setSeed=1):
 
     '''
     idxData = driveProfiles.copy()
-
     seed(setSeed)  # seed random number generator for reproducibility
-
     idxData['randNo'] = np.random.random(len(idxData))
     idxData['randNo'] = [random() for _ in range(len(idxData))]  # generate one random number for each profile / index
     randNos = idxData.loc[:, 'randNo']
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(randNos)
+    return randNos
 
 
-def calcIndices(chargeProfiles,
-                consumptionProfiles,
-                driveProfiles,
-                driveProfilesFuelAux,
-                randNos,
-                scalars,
-                fuelDriveTolerance,
-                isBEV):
-    # Maybe make this function neater by giving filtering functions as params or in a separate file??
+def calcProfileSelectors(chargeProfiles,
+                         consumptionProfiles,
+                         driveProfiles,
+                         driveProfilesFuelAux,
+                         randNos,
+                         scalars,
+                         fuelDriveTolerance,
+                         isBEV):
+    # FIXME Maybe make this function neater by giving filtering functions as params or in a separate file??
 
     '''
     This function calculates two filters. The first filter, filterCons, excludes profiles that depend on auxiliary
@@ -490,14 +457,7 @@ def calcIndices(chargeProfiles,
     print('There are ' + str(sum(filterCons['indexCons'])) + ' considered profiles and ' + \
                     str(sum(filterCons['indexDSM'])) + ' DSM eligible profiles.')
     filterCons_out = filterCons.loc[:, ['randNo', 'indexCons', 'indexDSM']]
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(filterCons_out)
-
-    # Debugging and Checking
-    # pd.set_option('display.max_columns', None, 'display.max_rows', 20)
-    # print(filterCons.iloc[0:20, :])
-    # print(len(np.where(filterCons['indexCons'])))
+    return filterCons_out
 
 
 def calcElectricPowerProfiles(consumptionProfiles, driveProfilesFuelAux, scalars, filterCons, scalarsProc,
@@ -519,17 +479,13 @@ def calcElectricPowerProfiles(consumptionProfiles, driveProfilesFuelAux, scalars
     Data Manager under the key specified by dmgrName.
     '''
 
-    # consumptionProfiles = dmgr['consumptionProfiles'].copy()
-    # driveProfilesFuelAux = dmgr['driveProfilesFuelAux'].copy()
     consumptionPower = scalars.loc['Verbrauch NEFZ CD', 'value']
     consumptionFuel = scalars.loc['Verbrauch NEFZ CS', 'value']
     indexCons = filterCons.loc[:, 'indexCons']
     indexDSM = filterCons.loc[:, 'indexDSM']
     # datalogger.info(indexCons)
-
     nHours = scalarsProc['noHours']
     electricPowerProfiles = consumptionProfiles.copy()
-
     for idx in range(nHours):
         electricPowerProfiles[str(idx)] = (consumptionProfiles[str(idx)] - driveProfilesFuelAux[str(idx)] *
                                            (consumptionPower / consumptionFuel))
@@ -538,13 +494,11 @@ def calcElectricPowerProfiles(consumptionProfiles, driveProfilesFuelAux, scalars
             electricPowerProfiles[str(idx)] = electricPowerProfiles[str(idx)] * indexCons
         elif filterIndex == 'indexDSM':
             electricPowerProfiles[str(idx)] = electricPowerProfiles[str(idx)] * indexDSM
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(electricPowerProfiles)
+    return electricPowerProfiles
     # datalogger.info(electricPowerProfiles)
 
 
-def filterConsBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons, minValue, maxValue):
+def setUnconsideredBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons, minValue, maxValue):
     '''
     Sets all profile values with indexDSM = False to extreme values. For SoC max profiles, this means a value
     that is way higher than SoC max capacity. For SoC min this means usually 0. This setting is important for the
@@ -557,7 +511,6 @@ def filterConsBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons, minV
 
     chargeMinProfilesDSM = chargeMinProfiles.copy()
     chargeMaxProfilesDSM = chargeMaxProfiles.copy()
-
     # if len(chargeMaxProfilesCons) == len(filterCons): #len(chargeMaxProfilesCons) = len(chargeMinProfilesCons) by design
     # How can I catch pandas.core.indexing.IndexingError ?
     try:
@@ -566,41 +519,28 @@ def filterConsBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons, minV
     except:
         print("Declaration doesn't work. "
               "Maybe the length of filterCons differs from the length of chargeMaxProfiles")
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(chargeMaxProfilesDSM, chargeMinProfilesDSM)
-
-    # datalogger.info(len(chargeMaxProfilesDSM))
-
-    # pd.set_option('display.width', 300)
-    # pd.set_option('display.max_rows', None)
-    # print(filterCons.iloc[1:50, :])
-    # print(chargeMaxProfilesDSM.iloc[1:50, :])
-    # print(chargeMinProfilesDSM.iloc[1:50, :])
-    # print(chargeMaxProfilesDSM.ix[~filterCons['indexDSM'].astype('bool'),:])
+    return chargeMaxProfilesDSM, chargeMinProfilesDSM
 
 
 def indexFilter(chargeMaxProfiles, chargeMinProfiles, filterCons):
-    '''
+    """
     Filters out profiles where indexCons is False.
 
     :param profiles: Profile keys in DataManager given as list of strings.
     :return: Writes filtered profiles to DataManager under the key 'profilesCons' in a dictionary with keys given
     by parameter profiles.
-    '''
+    """
 
     profilesFilterConsMin = chargeMinProfiles.loc[filterCons['indexCons'], :]
     profilesFilterConsMax = chargeMaxProfiles.loc[filterCons['indexCons'], :]
     profilesFilterDSMMin = chargeMinProfiles.loc[filterCons['indexDSM'], :]
     profilesFilterDSMMax = chargeMinProfiles.loc[filterCons['indexDSM'], :]
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(profilesFilterConsMin, profilesFilterConsMax, profilesFilterDSMMin, profilesFilterDSMMax)
+    return profilesFilterConsMin, profilesFilterConsMax, profilesFilterDSMMin, profilesFilterDSMMax
 
 
 def socProfileSelection(profilesMin, profilesMax, filter, alpha):
     '''
-    Selects the nth highest value for each hour for min (max) profiles based on the percentage given in parameter
+    Selects the nth highest value for each hour for min (max profiles based on the percentage given in parameter
     'alpha'. If alpha = 10, the 10%-biggest (10%-smallest) value is selected, all other values are disregarded.
     Currently, in the Venco reproduction phase, the hourly values are selected independently of each other. min and max
     profiles have to have the same number of columns.
@@ -614,7 +554,6 @@ def socProfileSelection(profilesMin, profilesMax, filter, alpha):
 
     noProfiles = len(profilesMin)
     noProfilesFilter = int(alpha / 100 * noProfiles)
-
     if filter == 'singleValue':
         profileMinOut = profilesMin.iloc[0, :].copy()
         for col in profilesMin:
@@ -625,14 +564,11 @@ def socProfileSelection(profilesMin, profilesMax, filter, alpha):
             profileMaxOut[col] = max(profilesMax[col].nsmallest(noProfilesFilter))
 
     # elif params['filter'] == "profile"
-        # ToDo: Profile specific filtering
-
+    # ToDo: Profile specific filtering
     else:
         # review have you considered implementing your own error like class FilterError(Exception): pass which would give the user an additional hint on what went wrong?
         raise ValueError('You selected a filter method that is not implemented.')
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(profileMinOut, profileMaxOut)
+    return profileMinOut, profileMaxOut
 
 
 def normalizeProfiles(scalars, socMin, socMax, normReference):
@@ -649,10 +585,7 @@ def normalizeProfiles(scalars, socMin, socMax, normReference):
     '''
 
     normReference = scalars.loc[normReference, 'value']
-
     try:
-        # for key, value in profiles.items():
-        #     outputProfiles.append(value.div(float(normReference)))
         socMinNorm = socMin.div(float(normReference))
         socMaxNorm = socMax.div(float(normReference))
 
@@ -660,10 +593,7 @@ def normalizeProfiles(scalars, socMin, socMax, normReference):
         # review general if " is used instead of ' the escaping of \' is not necessary
         # review general so is this not a problem at all if this happens? As I understand this code, socMin and socMax would be unchanged by this function call
         print('There was a value error. I don\'t know what to tell you.')
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(socMinNorm, socMaxNorm)
-    # datalogger.info(outputProfiles)
+    return socMinNorm, socMaxNorm
 
 
 def filterConsProfiles(profile, filterCons, critCol):
@@ -677,9 +607,7 @@ def filterConsProfiles(profile, filterCons, critCol):
 
     # review general could the filterCons and critCol not be hardcoded or sotred in a hidden data structure, so that it has not to be passed directly between functions? A class could achieve this goal easily (providing a hidden data structure in the shape of an attribute) making the code more structured?
     outputProfile = profile.loc[filterCons[critCol], :]
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(outputProfile)
+    return outputProfile
 
 
 # so far not used. Plug profiles are aggregated in the action aggregateProfiles.
@@ -712,10 +640,7 @@ def aggregateProfiles(profilesIn):
     # review have you considered using pandas dataframe .T to transpose, use sum to get the sum of each column and then divide by lenProfiles? This would be more concise in writing and more performant than a python loop
     for colidx in profilesIn:
         profilesOut[colidx] = sum(profilesIn.loc[:, colidx]) / lenProfiles
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(profilesOut)
-    # datalogger.info(profiles_out)
+    return profilesOut
 
 
 def correctProfiles(scalars, profiles, profType):
@@ -751,56 +676,13 @@ def correctProfiles(scalars, profiles, profType):
     # review have you considered using pandas dataframe .T to transpose, use sum to get the sum of each column and then divide by lenProfiles? This would be more concise in writing and more performant than a python loop
     for colIdx in profiles.index:
         profilesOut[colIdx] = corrFactor * profiles[colIdx]
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(profilesOut)
+    return profilesOut
 
 
-
-
-##### DEPRECATED? ######
-# @action('VencoPy')
-# def aggregateProfiles(dmgr, config, params):
-#
-#     # TODO: Set column name to pname or use list instead of dataframe as looping data type
-#     '''
-#     This action aggregates profiles based on building the arithmetic mean for each hour. It thus transforms
-#     single-vehicle profiles to one fleet profile per profile type.
-#
-#     :param profiles: List of strings of DataManager keys referencing to profiles for aggregation.
-#     :param dmgrNames: List of strings that results get written to.
-#
-#     :return: Writes aggregated profiles to DataManager under the keys specified in dmgrNames.
-#     '''
-#
-#     profiles = {}
-#     for prof in params['profiles']:
-#         profiles[prof] = pd.DataFrame(dmgr[prof])
-#
-#     profiles_out = []
-#     for pname, prof in profiles.items():
-#         # initiating looping dataframe
-#         profiles_loop = pd.DataFrame(data = profiles[next(iter(profiles))].iloc[0, :],
-#                                         dtype = float,
-#                                         copy = True)
-#         profiles_loop.columns = [pname] # renaming the 1-column DataFrame
-#         noProfiles = len(prof)
-#
-#         # aggregation
-#         for colidx in prof:  # colidx: column index
-#             # profiles_loop.iloc[int(colidx), :] = sum(prof.loc[:, colidx]) / len(prof.loc[:, colidx])
-#             profiles_loop.iloc[int(colidx), :] = sum(prof.loc[:, colidx]) / noProfiles
-#
-#         profiles_out.append(profiles_loop)
-#
-#     # Write profiles to datamanager for given profile names
-#     for idx in range(len(params['dmgrNames'])):
-#         dmgr[params['dmgrNames'][idx]] = profiles_out[idx]
 
 # -----OUTPUT PROCESSING-------------------------------------------------------
 
-# @action('VencoPy')
-def cloneProfilesToYear(profile, linkDict, noOfHoursOutput, technologyLabel, filename):
+def cloneAndWriteProfiles(profile, linkDict, noOfHoursOutput, technologyLabel, filename):
     '''
     This action clones daily profiles to cover a whole year.
 
@@ -816,32 +698,9 @@ def cloneProfilesToYear(profile, linkDict, noOfHoursOutput, technologyLabel, fil
     cfg = yaml.load(open(linkDict['linkTSConfig']))
     linkRmx = linkDict['linkTSREMix']
 
-    # df = pd.DataFrame(columns=['technologies', 'timestep', nodes])
-    # df = df.set_index(['technologies', 'timestep'])
-
-    # df = pd.concat([pd.DataFrame([i], columns=['']) for i in range(1, 8761)], ignore_index=True)
-    # df[' '] = technologyLabel  # Add technology column
-    # df = df[[' ', '']]  # Re-arrange columns order
-    #
-    # for i in cfg['Nodes']:
-    #     df[i] = 0
-    #
-    # s = df[''] < 10
-    # s1 = (df[''] >= 10) & (df[''] < 100)
-    # s2 = (df[''] >= 100) & (df[''] < 1000)
-    # s3 = df[''] >= 1000
-    #
-    # df.loc[s, ''] = df.loc[s, ''].apply(lambda x: "{}{}".format('t000', x))
-    # df.loc[s1, ''] = df.loc[s1, ''].apply(lambda x: "{}{}".format('t00', x))
-    # df.loc[s2, ''] = df.loc[s2, ''].apply(lambda x: "{}{}".format('t0', x))
-    # df.loc[s3, ''] = df.loc[s3, ''].apply(lambda x: "{}{}".format('t', x))
-
     df = createEmptyDataFrame(technologyLabel, noOfHoursOutput, cfg['Nodes'])
     # review is this correct? What happens when noOfHoursOutput/len(profile) is smaller then 0? Then noOfClones would be negative and I am not sure if this would be coerced to 0 by the following int type cast later on. Is this handled upstream in the call chain?
     noOfClones = noOfHoursOutput / len(profile) - 1
-
-    # for name, prof in profiles.items():
-    #     profiles[name] = prof.append([prof] * 364, ignore_index=True)
 
     # review the int type cast could have a nasty side effect, as it is behaving like a floor operation for the float division above. Is this intended?
     profileCloned = profile.append([profile] * int(noOfClones), ignore_index=True)
@@ -850,37 +709,14 @@ def cloneProfilesToYear(profile, linkDict, noOfHoursOutput, technologyLabel, fil
         subHours = noOfHoursOutput - len(profileCloned)
         profileCloned = profileCloned.append(profile[range(subHours)], ignore_index=True)
 
-    # print(profiles)
-
-    # review this .copy() seems to be redundant if createEmptyDataFrame above indeed creates a fresh new empty dataframe. Am I missing something here?
+    # review this .copy() seems to be redundant if createEmptyDataFrame above indeed creates a fresh new empty
+    # dataframe. Am I missing something here?
     profilesOut = df.copy()
-    # df_chargeAv = df.copy()
-    # df_BatMax = df.copy()
-    # df_BatMin = df.copy()
-    # df_DrivePow = df.copy()
-    # df_UncontrCharge = df.copy()
 
     for i in cfg['NonNullNodes']:
         profilesOut.loc[:, i] = np.round(profileCloned, 3)
-        # df_chargeAv[i] = np.round(profiles['plugProfilesCons_out'] , 3)
-        # df_BatMax.loc[:, i] = np.round(profiles['SOCMax_out'], 3)
-        # df_BatMin.loc[:, i] = np.round(profiles['SOCMin_out'], 3)
-        # df_DrivePow.loc[:, i] = np.round(profiles['electricPowerProfiles_out'], 3)
-        # df_UncontrCharge.loc[:, i] = np.round(profiles['chargeProfilesUncontrolled_out'], 3)
-
-    # datalogger.info(df_chargeAv)
 
     profilesOut.to_csv(linkRmx + '/' + filename + '.csv', index=False)
-    # df_chargeAv.to_csv(linkRmx + '/' + params['outputStrPre'] + 'chargeAvail' + params['outputStrPost'] + '.csv',
-    #                    index=False)
-    # df_BatMax.to_csv(linkRmx + '/' + params['outputStrPre'] + 'batMax' + params['outputStrPost'] + '.csv',
-    #                  index=False)
-    # df_BatMin.to_csv(linkRmx + '/' + params['outputStrPre'] + 'batMin' + params['outputStrPost'] + '.csv',
-    #                  index=False)
-    # df_DrivePow.to_csv(linkRmx + '/' + params['outputStrPre'] + 'drivePower' + params['outputStrPost'] + '.csv',
-    #                    index=False)
-    # df_UncontrCharge.to_csv(linkRmx + '/' + params['outputStrPre'] + 'uncontrCharge' + params['outputStrPost'] + '.csv',
-    #                         index=False)
 
 
 def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
@@ -897,16 +733,16 @@ def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
     s2 = (df[''] >= 100) & (df[''] < 1000)
     s3 = df[''] >= 1000
 
-    # review: there exists the python string formatting mini language which provides padding of strings (also leading). see here: https://docs.python.org/3.4/library/string.html#format-specification-mini-language
-    #  I think with a format string of the shape 't'+'{0:0<4.0d}'.format(x) would result for all four lines below in the correct output. Then also lines 894 to 897 would be superfluous.
+    # review: there exists the python string formatting mini language which provides padding of strings (also leading).
+    # see here: https://docs.python.org/3.4/library/string.html#format-specification-mini-language
+    #  I think with a format string of the shape 't'+'{0:0<4.0d}'.format(x) would result for all four lines below in
+    #  the correct output. Then also lines 894 to 897 would be superfluous.
 
     df.loc[s, ''] = df.loc[s, ''].apply(lambda x: "{}{}".format('t000', x))
     df.loc[s1, ''] = df.loc[s1, ''].apply(lambda x: "{}{}".format('t00', x))
     df.loc[s2, ''] = df.loc[s2, ''].apply(lambda x: "{}{}".format('t0', x))
     df.loc[s3, ''] = df.loc[s3, ''].apply(lambda x: "{}{}".format('t', x))
-
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(df)
+    return df
 
 
 def writeProfilesToCSV(dmgr, config, params):
@@ -944,7 +780,9 @@ def appendOutputProfiles(dmgr, config, params):
     :return:
     """
     strDict = composeStringDict(params['pre'], params['names'], params['post'])
-    # review general these kind of prints can distract the user if the code is published, as there is no context to hint on what is displayed and why. Would it make sense to provide additional information or to remove it entirely?
+    # review general these kind of prints can distract the user if the code is published, as there is no context
+    # to hint on what is displayed and why. Would it make sense to provide additional information or to remove it
+    # entirely?
     print(strDict)
     dataDict = {}
     for key, strList in strDict.items():
@@ -974,74 +812,5 @@ def composeStringDict(pre, name, post):
             str = preIdx + nIdx + postIdx + '.csv'
             listStr.append(str)
         dict[nIdx] = listStr
+    return dict
 
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return(dict)
-
-
-### Questions to Ben ###
-# GENERAL
-# Does it make sense to read and write a lot within functions/actions or rather to read once at the beginning of
-# a function and write it to a function-specific variable?
-
-# Does it make sense to give run specific parameters as param to the action or rather in the input_data file?
-
-# in readInputScalar(): Why doesn't df_scalar.set_index('parameter') doesn't set the parameter column as the index column?
-
-# in procProfiles(): Why does the following line yield a DataFrame with correct columns and indices but with only
-# NaNs in the data columns?
-# profiles = pd.DataFrame(data=df_profilesRaw, index=df_profilesRaw.index, columns=params['profiles'])
-
-# in printProfiles(): The function gets a number of strings as identifiers for profiles stored in the dmgr. Thus, in
-# the action decorator, the required profiles cannot be specified. Is this OK? Can I access the parameters already in
-# the action call?
-
-
-## SANDBOX ##
-
-# @action('VencoPy', ['driveProfiles', 'plugProfiles_raw'], ['profilesInput'])
-# def procProfiles_old (dmgr, config, params):
-#
-#
-#     driveProfiles = dmgr['driveProfiles'].set_index(['CASEID', 'PKWID'])
-#     plugProfiles = dmgr['plugProfiles_raw'].set_index(['CASEID', 'PKWID'])
-#     driveProfiles = driveProfiles.stack() # outputs an indexed series
-#     plugProfiles = plugProfiles.stack() # outputs an indexed series
-#
-#     driveProfiles.index.names = ['CASEID', 'PKWID', 'hour']
-#     plugProfiles.index.names = ['CASEID', 'PKWID', 'hour']
-#     df_driveProfiles = pd.DataFrame(data=driveProfiles,
-#                                     index=driveProfiles.index,
-#                                     columns=["value"])
-#     df_plugProfiles = pd.DataFrame(data=plugProfiles,
-#                                     index=plugProfiles.index,
-#                                     columns=["value"])
-#
-#     # Merging both data frames into one frame with two columns since both series share the three indices
-#     # 'CASEID', 'PKWID' and 'hour'
-#     df_profilesRaw = pd.merge(df_driveProfiles, df_plugProfiles, on=['CASEID', 'PKWID', 'hour'], how='outer')
-#     df_profiles = df_profilesRaw.rename(index=str, columns={'value_x': 'driveProfile',
-#                                                             'value_y': 'plugProfile'})
-#     df_profiles = df_profiles.reset_index(level=['CASEID', 'PKWID', 'hour'])
-#     df_profiles.loc[:,'CASEID'] = df_profiles.CASEID.astype(np.int)
-#     df_profiles.loc[:, 'PKWID'] = df_profiles.PKWID.astype(np.int)
-#     df_profiles.loc[:, 'hour'] = df_profiles.hour.astype(np.int)
-#     dmgr['profilesInput'] = df_profiles
-#     # print(df_profiles.info())
-#     # print(df_profiles.head)
-
-# FOR LOOP FROM calcIndices()
-# for ridx in range(len(boolIndices)):
-#     boolIndices.ix[ridx, 'bolFuelDriveTolerance'] = sum(driveProfilesFuelAux.ix[ridx, dataColStart : dataColEnd]) \
-#                                                      * boolBEV < fuelDriveTolerance
-#     boolIndices.ix[ridx, 'bolMinDailyMileage'] = (sum(driveProfiles.ix[ridx, dataColStart : dataColEnd]) >
-#          2 * randNos.ix[ridx, 'randNo'] * minDailyMileage +
-#          (1-randNos.ix[ridx, 'randNo']) * minDailyMileage * params['isBEV2030'])
-#     boolIndices.ix[ridx, 'indexCons'] = boolIndices.ix[ridx,  'bolFuelDriveTolerance'] and \
-#                            boolIndices.ix[ridx, 'bolMinDailyMileage']
-#     boolIndices.ix[ridx, 'bolConsumption'] = sum(consumptionProfiles.ix[ridx, dataColStart : dataColEnd]) < \
-#                                      sum(chargeProfiles.ix[ridx, dataColStart : dataColEnd])
-#     boolIndices.ix[ridx, 'bolSuffBat'] = sum(consumptionProfiles.ix[ridx, dataColStart: dataColEnd]) < \
-#                                              batSize * (socMax - socMin)
-#     boolIndices.ix[ridx, 'indexDSM'] = boolIndices.ix[ridx,  'bolConsumption'] and \
-#                            boolIndices.ix[ridx, 'bolSuffBat']
