@@ -1,30 +1,20 @@
 # -*- coding:utf-8 -*-
 
 __version__ = '0.1.0'
-__maintainer__ = 'Niklas Wulff 04.02.2020'
+__maintainer__ = 'Niklas Wulff 24.02.2020'
 __email__ = 'Niklas.Wulff@dlr.de'
-__birthdate__ = '15.04.2019'
+__birthdate__ = '24.02.2020'
 __status__ = 'test'  # options are: dev, test, prod
 
 # This script holds the function definitions for calculating the five profiles for describing
 # electric vehicle consumptions in VencoPy.
 
-import os
-import sys
-import warnings
-
-sys.path.append(os.path.abspath('C:/REMix-OaM/OptiMo/projects/REMix-tools/remixPlotting'))
-
 import numpy as np
-import yaml
-import pandas as pd
-from functools import reduce
 from random import seed
 from random import random
 
 # review (RESOLVED): general remark for publication: can we rename scripts into tools or libs? It is not really
 # a script what is saved in this folder and seems a bit missleading --> lib.py
-####-------------------GENERAL------------------------------####
 
 # review (RESOLVED) have you considered splitting this file up into different files, named after the captions in this file?
 # It would make it easier to navigate and search the code base

@@ -1,24 +1,17 @@
 # -*- coding:utf-8 -*-
 
 __version__ = '0.1.0'
-__maintainer__ = 'Niklas Wulff 04.02.2020'
+__maintainer__ = 'Niklas Wulff 24.02.2020'
 __email__ = 'Niklas.Wulff@dlr.de'
-__birthdate__ = '15.04.2019'
+__birthdate__ = '24.02.2020'
 __status__ = 'test'  # options are: dev, test, prod
 
 # This file holds the function definitions for VencoPy input functions.
-
-import os
-import sys
-
-sys.path.append(os.path.abspath('C:/REMix-OaM/OptiMo/projects/REMix-tools/remixPlotting'))
 
 import yaml
 import pandas as pd
 
 # ToDo: Explicit strings from current Excel file in the code. Is it possible to implement that better???
-
-# -----INPUT-----------------------------------
 # review (RESOLVED) have you considered splitting this file up into different files, named after the captions in this
 # file? It would make it easier to navigate and search the code base
 

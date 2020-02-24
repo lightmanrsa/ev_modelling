@@ -1,18 +1,14 @@
 # -*- coding:utf-8 -*-
 
 __version__ = '0.1.0'
-__maintainer__ = 'Niklas Wulff 04.02.2020'
+__maintainer__ = 'Niklas Wulff 24.02.2020'
 __email__ = 'Niklas.Wulff@dlr.de'
-__birthdate__ = '15.04.2019'
+__birthdate__ = '24.02.2020'
 __status__ = 'test'  # options are: dev, test, prod
 
 # This file holds the function definitions for preprocessing after data input for VencoPy.
 
-import os
-import sys
 import warnings
-
-sys.path.append(os.path.abspath('C:/REMix-OaM/OptiMo/projects/REMix-tools/remixPlotting'))
 
 
 def indexProfile(driveProfiles_raw, plugProfiles_raw, indices):
