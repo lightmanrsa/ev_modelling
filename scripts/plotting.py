@@ -24,6 +24,7 @@ from functools import reduce
 from random import seed
 from random import random
 
+# review general why is timeseriesREMix.yaml in scripts? Is this the appropriate location for this file? I would expect it to be in the config or data folder.
 
 # ToDo: Write more statistic information below plots
 
@@ -32,6 +33,8 @@ def createPlot(data, x, y, hue, link, showplot):
     sns.lineplot(x=x, y=y, hue=hue, sort=False,
                  data=data)
     plt.savefig(link, dpi=300)
+
+    # review general showplot could be moved into a config or config like python file, that serves the same purpose. Then the user could switch on interactive plots in one spot in the framework and there would be no need for explicitly passing showplot to the function.
     if showplot:
         plt.show()
 
