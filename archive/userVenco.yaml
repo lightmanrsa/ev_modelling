@@ -15,13 +15,13 @@ __status__ = 'dev'  # options are: dev, test, prod
 #  - action2:
 #      project: VencoPy
 #      call: procProfiles
-#      profiles: ['driveProfiles_raw', 'plugProfiles_raw']
+#      profiles: ['driveProfilesRaw', 'plugProfilesRaw']
 #      dmgrName: 'profilesInput'
 
   - action2b:
       project: VencoPy
       call: indexProfiles
-      profilesInput: ['driveProfiles_raw', 'plugProfiles_raw']
+      profilesInput: ['driveProfilesRaw', 'plugProfilesRaw']
       indices: ['CASEID', 'PKWID']
       profilesDmgr: ['driveProfiles', 'plugProfiles']
 
@@ -40,7 +40,7 @@ __status__ = 'dev'  # options are: dev, test, prod
 
   - action5:
       project: VencoPy
-      call: calcChargeProfile
+      call: calcChargeProfiles
 
   - action6:
       project: VencoPy
@@ -49,7 +49,7 @@ __status__ = 'dev'  # options are: dev, test, prod
 
   - action7:
       project: VencoPy
-      call: calcChargeProfileUncontrolled
+      call: calcChargeProfilesUncontrolled
 
   - action8:
       project: VencoPy
@@ -66,7 +66,7 @@ __status__ = 'dev'  # options are: dev, test, prod
 
   - action11:
       project: VencoPy
-      call: calcIndices
+      call: calcProfileSelectors
       fuelDriveTolerance: 0.001
       isBEV2030: True
 
@@ -78,7 +78,7 @@ __status__ = 'dev'  # options are: dev, test, prod
 
   - action12:
       project: VencoPy
-      call: filterConsBatProfiles
+      call: setUnconsideredBatProfiles
       maxValue: 9999
       minValue: 0
 
@@ -133,7 +133,7 @@ __status__ = 'dev'  # options are: dev, test, prod
 
   - action21:
       project: VencoPy
-      call: cloneProfilesToYear
+      call: cloneAndWriteProfiles
       profiles: ['plugProfilesCons_out', 'chargeProfilesUncontrolled_out',
                  'electricPowerProfiles_out', 'driveProfilesFuelAux_out',
                  'SOCMax_out', 'SOCMin_out']
@@ -179,8 +179,8 @@ __status__ = 'dev'  # options are: dev, test, prod
 #  - debugAction2:
 #      project: VencoPy
 #      call: printProfiles
-#      profiles: ['driveProfiles_raw', 'plugProfiles_raw', 'consumptionProfiles', 'chargeProfiles',
-#      'chargeMaxProfiles', 'chargeProfilesUncontrolled', 'driveProfilesFuelAux', 'chargeMinProfiles', 'boolIndices']
+#      profiles: ['driveProfilesRaw', 'plugProfilesRaw', 'consumptionProfiles', 'chargeProfiles',
+#      'chargeMaxProfiles', 'chargeProfilesUncontrolled', 'driveProfilesFuelAux', 'chargeMinProfiles', 'profileSelectors']
 #      #'SOCMax', 'SOCMin', 'electricPowerProfiles',
 #      caseIDs: ['4803', '84490', '93345', '112106']
 
