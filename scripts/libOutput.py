@@ -11,8 +11,10 @@ __status__ = 'test'  # options are: dev, test, prod
 import numpy as np
 import yaml
 import pandas as pd
+from .libLogging import logit
+from .libLogging import logger
 
-
+@logit
 def cloneAndWriteProfiles(profile, linkDict, noOfHoursOutput, technologyLabel, filename):
     """
     This action clones daily profiles to cover the specified time horizon given in noOfHoursOutput.
@@ -52,7 +54,7 @@ def cloneAndWriteProfiles(profile, linkDict, noOfHoursOutput, technologyLabel, f
 
     profilesOut.to_csv(linkRmx + '/' + filename + '.csv', index=False)
 
-
+@logit
 def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
     df = pd.concat([pd.DataFrame([i], columns=['']) for i in range(1, numberOfHours + 1)], ignore_index=True)
     df[' '] = technologyLabel  # Add technology column
@@ -78,7 +80,7 @@ def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
     df.loc[s3, ''] = df.loc[s3, ''].apply(lambda x: "{}{}".format('t', x))
     return df
 
-
+@logit
 def writeProfilesToCSV(dmgr, config, params):
     '''
     Writes the profiles specified in parameter profiles to a csv file.
@@ -104,7 +106,7 @@ def writeProfilesToCSV(dmgr, config, params):
             prof = dmgr[iprof]
             prof.to_csv(dmgr['linkDict']['linkOutput'] + '/vencoOutput' + iprof + params['stradd'] + '.csv')
 
-
+@logit
 def appendOutputProfiles(dmgr, config, params):
     """
 
@@ -137,7 +139,7 @@ def appendOutputProfiles(dmgr, config, params):
                                            key + params['outputPost'] + '.csv',
                                float_format = '%.3f')
 
-
+@logit
 def composeStringDict(pre, name, post):
     dict = {}
     # review name implies a single string name or alike, however the loop implies it to be a list of names. Would it be more precise if name would be renamed into names?

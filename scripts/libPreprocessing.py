@@ -9,8 +9,10 @@ __status__ = 'test'  # options are: dev, test, prod
 # This file holds the function definitions for preprocessing after data input for VencoPy.
 
 import warnings
+from .libLogging import logit
+from .libLogging import logger
 
-
+@logit
 def indexProfile(driveProfiles_raw, plugProfiles_raw, indices):
     '''
     Takes raw data as input and indices different profiles with the specified index columns und an unstacked form.
@@ -27,7 +29,7 @@ def indexProfile(driveProfiles_raw, plugProfiles_raw, indices):
     # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
     return (driveProfile, plugProfile)
 
-
+@logit
 def procScalars(driveProfiles_raw, plugProfiles_raw, driveProfiles, plugProfiles):
     '''
     Calculates some scalars from the input data such as the number of hours of drive and plug profiles, the number of

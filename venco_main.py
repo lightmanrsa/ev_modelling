@@ -11,6 +11,7 @@ from scripts.libPreprocessing import *
 from scripts.libProfileCalculation import *
 from scripts.libOutput import *
 from scripts.plotting import *
+from scripts.libLogging import logit
 
 
 #ToDO: Write an action to write processed scalars to scalarsProc after filtering to write meta-information to file

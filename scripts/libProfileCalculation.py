@@ -12,6 +12,9 @@ __status__ = 'test'  # options are: dev, test, prod
 import numpy as np
 from random import seed
 from random import random
+from .libLogging import logit
+from .libLogging import logger
+
 
 # review (RESOLVED): general remark for publication: can we rename scripts into tools or libs? It is not really
 # a script what is saved in this folder and seems a bit missleading --> lib.py
@@ -19,7 +22,7 @@ from random import random
 # review (RESOLVED) have you considered splitting this file up into different files, named after the captions in this file?
 # It would make it easier to navigate and search the code base
 
-
+@logit
 def calcConsumptionProfiles(driveProfiles, scalars):
     '''
     Calculates electrical consumption profiles from drive profiles assuming specific consumption (in kWh/100 km)
@@ -36,7 +39,7 @@ def calcConsumptionProfiles(driveProfiles, scalars):
     consumptionProfiles = consumptionProfiles * float(scalars.loc['Verbrauch NEFZ CD', 'value']) / 100
     return consumptionProfiles
 
-
+@logit
 def calcChargeProfiles(plugProfiles, scalars):
     '''
     Calculates the maximum possible charge power based on the plug profile assuming the charge column power
@@ -51,7 +54,7 @@ def calcChargeProfiles(plugProfiles, scalars):
     chargeProfiles = chargeProfiles * float(scalars.loc['Panschluss', 'value'])
     return chargeProfiles
 
-
+@logit
 def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsProc, nIter):
     '''
     Calculates all maximum SoC profiles under the assumption that batteries are always charged as soon as they
@@ -108,7 +111,7 @@ def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsP
     chargeMaxProfiles.drop(labels='newCharge', axis='columns', inplace=True)
     return chargeMaxProfiles
 
-
+@logit
 def calcChargeProfilesUncontrolled(chargeMaxProfiles, scalarsProc):
     '''
     Calculates the uncontrolled electric charging based on SoC Max profiles for each hour for each profile.
@@ -146,7 +149,7 @@ def calcChargeProfilesUncontrolled(chargeMaxProfiles, scalarsProc):
     return chargeProfilesUncontrolled
     # datalogger.info(chargeProfilesUncontrolled)
 
-
+@logit
 def calcDriveProfilesFuelAux(chargeMaxProfiles, chargeProfilesUncontrolled, driveProfiles, scalars, scalarsProc):
     #ToDo: alternative vectorized format for looping over columns? numpy, pandas: broadcasting-rules
     '''
@@ -180,7 +183,7 @@ def calcDriveProfilesFuelAux(chargeMaxProfiles, chargeProfilesUncontrolled, driv
     driveProfilesFuelAux = driveProfilesFuelAux.round(4)
     return driveProfilesFuelAux
 
-
+@logit
 def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuelAux, scalars, scalarsProc, nIter):
     #ToDo param minSecurityFactor
     '''
@@ -242,7 +245,7 @@ def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuel
     chargeMinProfiles.drop('newCharge', axis='columns', inplace=True)
     return chargeMinProfiles
 
-
+@logit
 def createRandNo(driveProfiles, setSeed=1):
     # review for me the function name is not precise. The function creates to my understanding a random profile. If this is the case, I would name it accordingly.
     '''
@@ -259,7 +262,7 @@ def createRandNo(driveProfiles, setSeed=1):
     randNos = idxData.loc[:, 'randNo']
     return randNos
 
-
+@logit
 def calcProfileSelectors(chargeProfiles,
                          consumptionProfiles,
                          driveProfiles,
@@ -316,7 +319,7 @@ def calcProfileSelectors(chargeProfiles,
     filterCons_out = filterCons.loc[:, ['randNo', 'indexCons', 'indexDSM']]
     return filterCons_out
 
-
+@logit
 def calcElectricPowerProfiles(consumptionProfiles, driveProfilesFuelAux, scalars, filterCons, scalarsProc,
                               filterIndex):
     '''
@@ -354,7 +357,7 @@ def calcElectricPowerProfiles(consumptionProfiles, driveProfilesFuelAux, scalars
     return electricPowerProfiles
     # datalogger.info(electricPowerProfiles)
 
-
+@logit
 def setUnconsideredBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons, minValue, maxValue):
     '''
     Sets all profile values with indexDSM = False to extreme values. For SoC max profiles, this means a value
@@ -378,7 +381,7 @@ def setUnconsideredBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons,
               "Maybe the length of filterCons differs from the length of chargeMaxProfiles")
     return chargeMaxProfilesDSM, chargeMinProfilesDSM
 
-
+@logit
 def indexFilter(chargeMaxProfiles, chargeMinProfiles, filterCons):
     """
     Filters out profiles where indexCons is False.
@@ -394,7 +397,7 @@ def indexFilter(chargeMaxProfiles, chargeMinProfiles, filterCons):
     profilesFilterDSMMax = chargeMinProfiles.loc[filterCons['indexDSM'], :]
     return profilesFilterConsMin, profilesFilterConsMax, profilesFilterDSMMin, profilesFilterDSMMax
 
-
+@logit
 def socProfileSelection(profilesMin, profilesMax, filter, alpha):
     '''
     Selects the nth highest value for each hour for min (max profiles based on the percentage given in parameter
@@ -427,7 +430,7 @@ def socProfileSelection(profilesMin, profilesMax, filter, alpha):
         raise ValueError('You selected a filter method that is not implemented.')
     return profileMinOut, profileMaxOut
 
-
+@logit
 def normalizeProfiles(scalars, socMin, socMax, normReference):
     # ToDo: Implement a normalization to the maximum of a given profile
 
@@ -452,7 +455,7 @@ def normalizeProfiles(scalars, socMin, socMax, normReference):
         print('There was a value error. I don\'t know what to tell you.')
     return socMinNorm, socMaxNorm
 
-
+@logit
 def filterConsProfiles(profile, filterCons, critCol):
     '''
     Filter out all profiles from given profile types whose boolean indices (so far DSM or cons) are FALSE.
@@ -467,7 +470,8 @@ def filterConsProfiles(profile, filterCons, critCol):
     return outputProfile
 
 
-# so far not used. Plug profiles are aggregated in the action aggregateProfiles.
+# FIXME so far not used. Plug profiles are aggregated in the action aggregateProfiles.
+@logit
 def considerProfiles(profiles, consider, colStart, colEnd, colCons):
     profilesOut = profiles.copy()
 
@@ -479,7 +483,7 @@ def considerProfiles(profiles, consider, colStart, colEnd, colCons):
             "The key {} is not part of {}".format(colCons, consider))
     return profilesOut
 
-
+@logit
 def aggregateProfiles(profilesIn):
     '''
     This action aggregates all single-vehicle profiles that are considered to one fleet profile. There is a separate
@@ -499,7 +503,7 @@ def aggregateProfiles(profilesIn):
         profilesOut[colidx] = sum(profilesIn.loc[:, colidx]) / lenProfiles
     return profilesOut
 
-
+@logit
 def correctProfiles(scalars, profiles, profType):
     '''
     This action scales given profiles by a correction factor. It was written for VencoPy scaling consumption data

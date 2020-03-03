@@ -10,16 +10,21 @@ __status__ = 'test'  # options are: dev, test, prod
 
 import yaml
 import pandas as pd
+from .libLogging import logit
+from .libLogging import logger
 
 # ToDo: Explicit strings from current Excel file in the code. Is it possible to implement that better???
 # review (RESOLVED) have you considered splitting this file up into different files, named after the captions in this
 # file? It would make it easier to navigate and search the code base
 
+
+@logit
 def readVencoConfig(cfgLink):
     config = yaml.load(open(cfgLink), Loader=yaml.SafeLoader)
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return (config)
+    return config
 
+
+@logit
 def initializeLinkMgr(vencoConfig):
     linkDict_out = {'linkScalars': vencoConfig['linksAbsolute']['inputData'] + vencoConfig['files']['inputDataScalars'],
                     'linkDriveProfiles': vencoConfig['linksAbsolute']['inputData'] + vencoConfig['files'][
@@ -30,39 +35,45 @@ def initializeLinkMgr(vencoConfig):
                     'linkTSREMix': vencoConfig['linksAbsolute']['REMixTimeseriesPath'],
                     'linkPlots': vencoConfig['linksRelative']['plots'],
                     'linkOutput': vencoConfig['linksAbsolute']['OutputPath']}
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return (linkDict_out)
+    return linkDict_out
 
-def readInputScalar(fileLink):
-    # review general remark, a file link implies a sym link on the disk. Have you considered renaming the variable to filePath for example, which would imply a path to a file on the disk
-    input_raw = pd.read_excel(fileLink,
+
+@logit
+def readInputScalar(filePath):
+    # review general remark (RESOLVED), a file link implies a sym link on the disk. Have you considered renaming the
+    # variable to filePath for example, which would imply a path to a file on the disk
+    inputRaw = pd.read_excel(filePath,
                               header=5,
                               usecols="A:E",
                               skiprows=0)
-    df_scalar = input_raw.loc[:, ~input_raw.columns.str.match('Unnamed')]
-    df_out = df_scalar.set_index('parameter')
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return (df_out)
+    scalar = inputRaw.loc[:, ~inputRaw.columns.str.match('Unnamed')]
+    scalarsOut = scalar.set_index('parameter')
+    return scalarsOut
 
+
+@logit
 def readInputCSV(file_link):
-    input_raw = pd.read_csv(file_link, header=4)
-    df_out = input_raw.loc[:, ~input_raw.columns.str.match('Unnamed')]
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return (df_out)
+    inputRaw = pd.read_csv(file_link, header=4)
+    inputData = inputRaw.loc[:, ~inputRaw.columns.str.match('Unnamed')]
+    return inputData
 
+
+@logit
 def stringToBoolean(df):
-    dict_bol = {'WAHR': True,
+    dictBol = {'WAHR': True,
                 'FALSCH': False}
-    df_out = df.replace(to_replace=dict_bol, value=None)
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return (df_out)
+    outBool = df.replace(to_replace=dictBol, value=None)
+    return (outBool)
 
-def readInputBoolean(file_link):
-    input_raw = readInputCSV(file_link)
-    df_out = stringToBoolean(input_raw)
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return (df_out)
 
+@logit
+def readInputBoolean(filePath):
+    inputRaw = readInputCSV(filePath)
+    inputData = stringToBoolean(inputRaw)
+    return inputData
+
+
+@logit
 def readVencoInput(linkConfig):
     '''
     Initializing action for VencoPy-specific config-file, link dictionary and data read-in. The config file has
@@ -76,9 +87,7 @@ def readVencoInput(linkConfig):
     data, the latter three ones in a raw data format.
     '''
 
-    # print(params['linkConfig'])
     linkDict = initializeLinkMgr(readVencoConfig(linkConfig))
-    # dmgr['linkDict'] = linkDict
 
     # review: have you considered using the logging module for these kind of outputs?
     print('Reading Venco input scalars, drive profiles and boolean plug profiles')
@@ -91,8 +100,3 @@ def readVencoInput(linkConfig):
                     str(len(driveProfiles_raw)) + ' plug profiles.')
 
     return linkDict, scalars, driveProfiles_raw, plugProfiles_raw
-
-
-    # dmgr['scalars'] = scalars
-    # dmgr['driveProfilesRaw'] = driveProfilesRaw
-    # dmgr['plugProfilesRaw'] = plugProfilesRaw
