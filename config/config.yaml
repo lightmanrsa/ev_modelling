@@ -1,30 +1,26 @@
 #-*- coding:utf-8 -*-
 
-# __version__ = '0.0.1'
+# __version__ = '0.0.2'
 # __maintainer__ = 'Niklas Wulff 2019-02-12'
 # __email__ = 'Niklas.Wulff@dlr.de'
 # __birthdate__ = '2019-02-12'
 # __status__ = 'dev'  # options are: dev, test, prod
 
-# This script is written to replace the excel tool VENCO (Vehicle ENergy COnsumption profiles)
-# by a more abstract and more powerful python version.
-
-####### file links and paths ###
-#
+# This config holds all relative paths and filenames for VENCO
 
 linksRelative:
-    data: ./data/
+    input: ./inputData/
     plots: ./output/plots/
-    results: ./output/dailyTimeseries
+    resultsDaily: ./output/dailyTimeseries
+    resultsAnnual: ./output/annualTimeseries
     scripts: ./scripts/
     config: ./config/
     tsConfig: ./config/timeseriesREMix.yaml
 
-# During first configuartion, please fill in absolute links on your system
+# During first configuartion, optionally fill in absolute links on your system e.g. if you want to have post processed
+# output written to an energy system model input folder
 linksAbsolute:
-    inputData: C:/vencopy_repo/inputData/
-    REMixTimeseriesPath: C:/vencopy_repo/output/annualTimeseries/
-    OutputPath: C:/vencopy_repo/output/dailyTimeseries/
+    someLinkOnHardDrive: C:/REMix-OaM/OptiMo/projects/wulf_ni/paperModelCouplingCURRENT_repairCheckout/data/sus_base/data/timeSeriesGlobal
 
 files:
     inputDataScalars: VencoPy_inputData2030_BEV-S.xlsx

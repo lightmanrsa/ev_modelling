@@ -1,4 +1,4 @@
-__version__ = '0.1.0'
+__version__ = '0.0.7'
 __maintainer__ = 'Niklas Wulff'
 __email__ = 'Niklas.Wulff@dlr.de'
 __birthdate__ = '03.11.2019'
@@ -14,23 +14,17 @@ from scripts.plotting import *
 from scripts.libLogging import logit
 
 
-#ToDO: Write an action to write processed scalars to scalarsProc after filtering to write meta-information to file
 #ToDo: Maybe consolidate selection actions to one aggregation and one filtering action
 
 if __name__ == '__main__':
     #----- data and config read-in -----
-    # REVIEW (resolved) this should be a relative path as an absolute will not work on other peoples computers.
-    # Have you considered to use the pathlib? So far not, lets discuss!
-    linkConfig = './config/VencoPy_conf.yaml'
-    # REVIEW (resolved) the variable names both use camel case and snake case. I suggest sticking with one for the
-    # publication, as this can be irritating when reading the code
+    # REVIEW Have you considered to use the pathlib? So far not, lets discuss!
+    linkConfig = './config/config.yaml'
     linkDict, scalars, driveProfilesRaw, plugProfilesRaw = readVencoInput(linkConfig)
     indices = ['CASEID', 'PKWID']
     driveProfiles, plugProfiles = indexProfile(driveProfilesRaw, plugProfilesRaw, indices)
     scalarsProc = procScalars(driveProfilesRaw, plugProfilesRaw, driveProfiles, plugProfiles)
 
-    # REVIEW (resolved) the return value of the function implies multiple profiles while the function name implies
-    # only one is calculated. I suggest changing the naming to reflect the real situation
     consumptionProfiles = calcConsumptionProfiles(driveProfiles, scalars)
 
     # REVIEW (resolved) the return value of the function implies multiple profiles while the function name implies

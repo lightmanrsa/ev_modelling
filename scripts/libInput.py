@@ -26,15 +26,15 @@ def readVencoConfig(cfgLink):
 
 @logit
 def initializeLinkMgr(vencoConfig):
-    linkDict_out = {'linkScalars': vencoConfig['linksAbsolute']['inputData'] + vencoConfig['files']['inputDataScalars'],
-                    'linkDriveProfiles': vencoConfig['linksAbsolute']['inputData'] + vencoConfig['files'][
+    linkDict_out = {'linkScalars': vencoConfig['linksRelative']['input'] + vencoConfig['files']['inputDataScalars'],
+                    'linkDriveProfiles': vencoConfig['linksRelative']['input'] + vencoConfig['files'][
                         "inputDataDriveProfiles"],
-                    'linkPlugProfiles': vencoConfig['linksAbsolute']['inputData'] + vencoConfig['files'][
+                    'linkPlugProfiles': vencoConfig['linksRelative']['input'] + vencoConfig['files'][
                         "inputDataPlugProfiles"],
                     'linkTSConfig': vencoConfig['linksRelative']['tsConfig'],
-                    'linkTSREMix': vencoConfig['linksAbsolute']['REMixTimeseriesPath'],
+                    'linkTSREMix': vencoConfig['linksRelative']['resultsAnnual'],
                     'linkPlots': vencoConfig['linksRelative']['plots'],
-                    'linkOutput': vencoConfig['linksAbsolute']['OutputPath']}
+                    'linkOutput': vencoConfig['linksRelative']['resultsDaily']}
     return linkDict_out
 
 
