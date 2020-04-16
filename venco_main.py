@@ -20,7 +20,8 @@ if __name__ == '__main__':
     #----- data and config read-in -----
     # REVIEW Have you considered to use the pathlib? So far not, lets discuss!
     linkConfig = './config/config.yaml'
-    linkDict, scalars, driveProfilesRaw, plugProfilesRaw = readVencoInput(linkConfig)
+    config = yaml.load(open(linkConfig), Loader=yaml.SafeLoader)
+    linkDict, scalars, driveProfilesRaw, plugProfilesRaw = readVencoInput(config)
     indices = ['CASEID', 'PKWID']
     driveProfiles, plugProfiles = indexProfile(driveProfilesRaw, plugProfilesRaw, indices)
     scalarsProc = procScalars(driveProfilesRaw, plugProfilesRaw, driveProfiles, plugProfiles)
@@ -106,8 +107,6 @@ if __name__ == '__main__':
     electricPowerProfilesCorr = correctProfiles(scalars, electricPowerProfilesAgg, 'electric')
     driveProfilesFuelAuxCorr = correctProfiles(scalars, driveProfilesFuelAuxAgg, 'fuel')
 
-    # review (resolved) the next calls all seem to write a file to disc, however, the function name itself does not
-    # reflect this as cloning usually does not imply a write operation. Could this function be named more precisely?
     cloneAndWriteProfiles(socMinNorm, linkDict, 8760, technologyLabel='BEV-S',
                           filename='BEV_S_SOCMin_VencoPy_MR1_alpha1_batCap40_cons15')
 

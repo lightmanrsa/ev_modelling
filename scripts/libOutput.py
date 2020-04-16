@@ -39,14 +39,15 @@ def cloneAndWriteProfiles(profile, linkDict, noOfHoursOutput, technologyLabel, f
     # Is this handled upstream in the call chain?
     noOfClones = noOfHoursOutput / len(profile) - 1
 
-    # review the int type cast could have a nasty side effect, as it is behaving like a floor operation for the float division above. Is this intended?
+    # FixMe the int type cast could have a nasty side effect, as it is behaving like a floor operation
+    # for the float division above. Is this intended?
     profileCloned = profile.append([profile] * int(noOfClones), ignore_index=True)
 
     if len(profileCloned) < noOfHoursOutput:
         subHours = noOfHoursOutput - len(profileCloned)
         profileCloned = profileCloned.append(profile[range(subHours)], ignore_index=True)
 
-    # review this .copy() seems to be redundant if createEmptyDataFrame above indeed creates a fresh new empty
+    # FixMe this .copy() seems to be redundant if createEmptyDataFrame above indeed creates a fresh new empty
     # dataframe. Am I missing something here?
     profilesOut = df.copy()
     for i in cfg['NonNullNodes']:
@@ -54,13 +55,27 @@ def cloneAndWriteProfiles(profile, linkDict, noOfHoursOutput, technologyLabel, f
 
     profilesOut.to_csv(linkRmx + '/' + filename + '.csv', index=False)
 
+
 @logit
 def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
+    """
+    Creation method for building a specifically formatted dataframe for output processing of VencoPy profiles.
+
+    :param technologyLabel: String for an index column
+    :param numberOfHours: Length of resulting dataframe
+    :param nodes: Number of columns of resultung dataframe
+    :return: Empty dataframe with the technologyLabel as values in the first column, number of rows as specified by
+    numberOfHours. Nodes gives number of value columns.
+    """
+
     df = pd.concat([pd.DataFrame([i], columns=['']) for i in range(1, numberOfHours + 1)], ignore_index=True)
     df[' '] = technologyLabel  # Add technology column
     df = df[[' ', '']]  # Re-arrange columns order
 
-    # review if nodes is a list of column labels then one could also write it like this: df[nodes] = 0 instead of the explicit loop. I am not 100% sure of the syntax but there is a way to write this without a loop. Should be detailed in pandas indexing docu
+    # review if nodes is a list of column labels then one could also write it like this:
+    # df[nodes] = 0 instead of the explicit loop.
+    # I am not 100% sure of the syntax but there is a way to write this without a loop.
+    # Should be detailed in pandas indexing docu
     for i in nodes:
         df[i] = 0
 
@@ -80,15 +95,10 @@ def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
     df.loc[s3, ''] = df.loc[s3, ''].apply(lambda x: "{}{}".format('t', x))
     return df
 
+
 @logit
 def writeProfilesToCSV(dmgr, config, params):
-    '''
-    Writes the profiles specified in parameter profiles to a csv file.
-    :param dmgrKeys: Data Manager Keys under which the profiles for writing are stored.
-    :param outputFormat: Specification of output format. Can be either "singleFile" or "multiFile".
-    :param strAdd: Adds a string to the written .csv files.
-    :return: -
-    '''
+    # ADD DOCSTRING AFTER CORRECTIONS
 
     length = {}
     data = []
@@ -142,7 +152,8 @@ def appendOutputProfiles(dmgr, config, params):
 @logit
 def composeStringDict(pre, name, post):
     dict = {}
-    # review name implies a single string name or alike, however the loop implies it to be a list of names. Would it be more precise if name would be renamed into names?
+    # review name implies a single string name or alike, however the loop implies it to be a list of names.
+    # Would it be more precise if name would be renamed into names?
     for nIdx in name:
         listStr = []
         for preIdx, postIdx in zip(pre, post):

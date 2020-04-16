@@ -23,6 +23,13 @@ linksAbsolute:
     someLinkOnHardDrive: C:/REMix-OaM/OptiMo/projects/wulf_ni/paperModelCouplingCURRENT_repairCheckout/data/sus_base/data/timeSeriesGlobal
 
 files:
-    inputDataScalars: VencoPy_inputData2030_BEV-S.xlsx
-    inputDataDriveProfiles: VENCO_inputProfiles_Drive.csv
-    inputDataPlugProfiles: VENCO_inputProfiles_Plug.csv
+    inputDataScalars: VencoPy_scalarInput.xlsx
+    inputDataDriveProfiles: inputProfiles_Drive.csv
+    inputDataPlugProfiles: inputProfiles_Plug.csv
+
+labels:
+    technologyLabel: BEV-S
+    outputFileName: VencoPy_MR1_alpha1_batCap40_cons15
+
+postprocessing:
+    hoursClone: 8760

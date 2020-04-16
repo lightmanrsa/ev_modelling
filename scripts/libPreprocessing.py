@@ -14,39 +14,40 @@ from .libLogging import logger
 
 @logit
 def indexProfile(driveProfiles_raw, plugProfiles_raw, indices):
-    '''
+    """
     Takes raw data as input and indices different profiles with the specified index columns und an unstacked form.
 
-    :param driveProfiles_raw: Raw drive profiles.
-    :param plugProfiles_raw: Raw plug profiles.
-    :param indices: Index columns that are assigned as indices.
+    :param driveProfiles_raw: Dataframe of raw drive profiles in km with as many index columns as elements
+        of the list in given in indices. One column represents one timestep, e.g. hour.
+    :param plugProfiles_raw: Dataframe of raw plug profiles as boolean values with as many index columns
+        as elements of the list in given in indices. One column represents one timestep e.g. hour.
+    :param indices: List of column names given as strings.
     :return: Two indexed dataframes with index columns as given in argument indices separated from data columns
+    """
 
-    '''
-
-    driveProfile = driveProfiles_raw.set_index(list(indices))
-    plugProfile = plugProfiles_raw.set_index(list(indices))
-    # review: the brackets around config are not necessary as they will be removed by python anyway. Return is not a function but a statement
-    return (driveProfile, plugProfile)
+    driveProfiles = driveProfiles_raw.set_index(list(indices))
+    plugProfiles = plugProfiles_raw.set_index(list(indices))
+    return driveProfiles, plugProfiles
 
 @logit
 def procScalars(driveProfiles_raw, plugProfiles_raw, driveProfiles, plugProfiles):
-    '''
+    """
     Calculates some scalars from the input data such as the number of hours of drive and plug profiles, the number of
     profiles etc.
 
-    :return: Returns a dataframe of processed scalars including number of profiles and number of hours per profile.
-
-    '''
+    :param driveProfiles: Input drive profile input data frame with timestep specific driving distance in km
+    :param plugProfiles: Input plug profile input data frame with timestep specific boolean grid connection values
+    :return: Returns a dataframe of processed scalars including number of profiles and number of hours per profile
+    """
 
     noHoursDrive = len(driveProfiles.columns)
     noHoursPlug = len(plugProfiles.columns)
-    noDriveProfiles_in = len(driveProfiles_raw)
-    noPlugProfiles_in = len(plugProfiles_raw)
+    noDriveProfilesIn = len(driveProfiles)
+    noPlugProfilesIn = len(plugProfiles)
     scalarsProc = {'noHoursDrive': noHoursDrive,
                    'noHoursPlug': noHoursPlug,
-                   'noDriveProfiles_in': noDriveProfiles_in,
-                   'noPlugProfiles_in': noPlugProfiles_in}
+                   'noDriveProfilesIn': noDriveProfilesIn,
+                   'noPlugProfilesIn': noPlugProfilesIn}
     if noHoursDrive == noHoursPlug:
         scalarsProc['noHours'] = noHoursDrive
     else:

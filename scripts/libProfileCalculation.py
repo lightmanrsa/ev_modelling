@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
-__version__ = '0.1.0'
-__maintainer__ = 'Niklas Wulff 24.02.2020'
+__version__ = '0.0.7'
+__maintainer__ = 'Niklas Wulff 16.04.2020'
 __email__ = 'Niklas.Wulff@dlr.de'
 __birthdate__ = '24.02.2020'
 __status__ = 'test'  # options are: dev, test, prod
@@ -16,28 +16,26 @@ from .libLogging import logit
 from .libLogging import logger
 
 
-# review (RESOLVED): general remark for publication: can we rename scripts into tools or libs? It is not really
-# a script what is saved in this folder and seems a bit missleading --> lib.py
-
-# review (RESOLVED) have you considered splitting this file up into different files, named after the captions in this file?
-# It would make it easier to navigate and search the code base
-
 @logit
 def calcConsumptionProfiles(driveProfiles, scalars):
-    '''
+    """
     Calculates electrical consumption profiles from drive profiles assuming specific consumption (in kWh/100 km)
     given in scalar input data file.
 
-    :return: Returns the consumption profile in same format and length as driveProfiles but scaled with the specific
-    consumption assumption.
-
-    '''
+    :param driveProfiles: indexed profile file
+    :param Scalars: dataframe holding technical assumptions
+    :return: Returns a dataframe with consumption profiles in kWh/h in same format and length as driveProfiles but
+    scaled with the specific consumption assumption.
+    """
 
     consumptionProfiles = driveProfiles.copy()
     # review have you considered the pandas .astype() method? It is more performant than a direct float type cast.
-    # review the division by int 100 can be changed to float 100. which would force python above 2.7 to use float division and thus a typecast might not even be necessary
-    consumptionProfiles = consumptionProfiles * float(scalars.loc['Verbrauch NEFZ CD', 'value']) / 100
+    # review the division by int 100 can be changed to float 100. which would force python above 2.7 to use float
+    # division and thus a typecast might not even be necessary
+    # consumptionProfiles = consumptionProfiles * float(scalars.loc['Electric consumption NEFZ', 'value']) / 100
+    consumptionProfiles = consumptionProfiles * scalars.loc['Electric consumption NEFZ', 'value'] / float(100)
     return consumptionProfiles
+
 
 @logit
 def calcChargeProfiles(plugProfiles, scalars):
@@ -45,18 +43,20 @@ def calcChargeProfiles(plugProfiles, scalars):
     Calculates the maximum possible charge power based on the plug profile assuming the charge column power
     given in the scalar input data file (so far under Panschluss).
 
+    :param plugProfiles: indexed boolean profiles for vehicle connection to grid
+    :param scalars: VencoPy scalar dataframe
     :return: Returns scaled plugProfile in the same format as plugProfiles.
-
     '''
 
     chargeProfiles = plugProfiles.copy()
     # review have you considered the pandas .astype() method? It is more performant than a direct float type cast.
-    chargeProfiles = chargeProfiles * float(scalars.loc['Panschluss', 'value'])
+    chargeProfiles = chargeProfiles * float(scalars.loc['Rated power of charging column', 'value'])
     return chargeProfiles
+
 
 @logit
 def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsProc, nIter):
-    '''
+    """
     Calculates all maximum SoC profiles under the assumption that batteries are always charged as soon as they
     are plugged to the grid. Values are assured to not fall below SoC_min * battery capacity or surpass
     SoC_max * battery capacity. Relevant profiles are chargeProfile and consumptionProfile. An iteration assures
@@ -70,14 +70,13 @@ def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsP
     :param nIter: Number of iterations to assure that the minimum and maximum value are approximately the same
     :return: Returns an indexed DataFrame with the same length and form as chargProfiles and consumptionProfiles,
     containing single-profile SOC max values for each hour in each profile.
-
-    '''
+    """
 
     chargeMaxProfiles = chargeProfiles.copy()
     chargeProfiles = chargeProfiles.copy()
     consumptionProfiles = consumptionProfiles.copy()
-    batCapMin = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmin', 'value']
-    batCapMax = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmax', 'value']
+    batCapMin = scalars.loc['Battery capacity', 'value'] * scalars.loc['Minimum SOC', 'value']
+    batCapMax = scalars.loc['Battery capacity', 'value'] * scalars.loc['Maximum SOC', 'value']
     nHours = scalarsProc['noHours']
     idxIt = 1
     for idxIt in range(nIter):
@@ -111,30 +110,24 @@ def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsP
     chargeMaxProfiles.drop(labels='newCharge', axis='columns', inplace=True)
     return chargeMaxProfiles
 
+
 @logit
 def calcChargeProfilesUncontrolled(chargeMaxProfiles, scalarsProc):
-    '''
-    Calculates the uncontrolled electric charging based on SoC Max profiles for each hour for each profile.
+    """
+    Calculates uncontrolled electric charging based on SoC Max profiles for each hour for each profile.
 
+    :param chargeMaxProfiles: Dataframe holding timestep dependent SOC max values for each profile.
+    :param scalarsProc: VencoPy Dataframe holding meta-information about read-in profiles.
     :return: Returns profiles for uncontrolled charging under the assumption that charging occurs as soon as a
     vehicle is connected to the grid up to the point that the maximum battery SOC is reached or the connection
     is interrupted. DataFrame has the same format as chargeMaxProfiles.
-
-    '''
+    """
 
     chargeMaxProfiles = chargeMaxProfiles.copy()
     chargeProfilesUncontrolled = chargeMaxProfiles.copy()
     nHours = scalarsProc['noHours']
 
     for idx in range(nHours):
-
-        # testing line
-        # chargeMaxProfile.ix[3, '0'] = 15.0
-        # if idx == 0:
-        #     chargeProfilesUncontrolled[str(0)] = np.where(
-        #         chargeMaxProfiles[str(0)] >= chargeMaxProfiles[str(nHours-1)],
-        #         chargeMaxProfiles[str(0)] - chargeMaxProfiles[str(nHours-1)],
-        #         0)
 
         if idx != 0:
             chargeProfilesUncontrolled[str(idx)] = np.where(
@@ -145,48 +138,55 @@ def calcChargeProfilesUncontrolled(chargeMaxProfiles, scalarsProc):
     # set value of uncontrolled charging for first hour to average between hour 1 and hour 23
     # because in calcChargeMax iteration the difference is minimized.
     chargeProfilesUncontrolled[str(0)] = \
-        (chargeProfilesUncontrolled[str(1)] + chargeProfilesUncontrolled[str(nHours - 1)])/2
+        (chargeProfilesUncontrolled[str(1)] + chargeProfilesUncontrolled[str(nHours - 1)]) / 2
     return chargeProfilesUncontrolled
-    # datalogger.info(chargeProfilesUncontrolled)
+
 
 @logit
 def calcDriveProfilesFuelAux(chargeMaxProfiles, chargeProfilesUncontrolled, driveProfiles, scalars, scalarsProc):
     #ToDo: alternative vectorized format for looping over columns? numpy, pandas: broadcasting-rules
-    '''
-    Calculates necessary fuel consumption profile of a potential auxilliary unit (e.g. a gasoline motor) based
+    """
+     Calculates necessary fuel consumption profile of a potential auxilliary unit (e.g. a gasoline motor) based
     on gasoline consumption given in scalar input data (in l/100 km). Auxilliary fuel is needed if an hourly
     mileage is higher than the available SoC Max in that hour.
 
+    :param chargeMaxProfiles: Dataframe holding hourly maximum SOC profiles in kWh for all profiles
+    :param chargeProfilesUncontrolled: Dataframe holding hourly uncontrolled charging values in kWh/h for all profiles
+    :param driveProfiles: Dataframe holding hourly electric driving demand in kWh/h for all profiles.
+    :param scalars: Dataframe holding technical assumptions
+    :param scalarsProc: Dataframe holding meta-infos about the input
     :return: Returns a DataFrame with single-profile values for back-up fuel demand in the case a profile cannot
     completely be fulfilled with electric driving under the given consumption and battery size assumptions.
+    """
 
-    '''
-
-    # review: the hardcoding of the column names can cause a lot of problems for people later on if we do not ship the date with the tool. I would recommend to move these column names to a config file similar to i18n strategies
-    consumptionPower = scalars.loc['Verbrauch NEFZ CD', 'value']
-    consumptionFuel = scalars.loc['Verbrauch NEFZ CS', 'value']
+    # review: the hardcoding of the column names can cause a lot of problems for people later on if we do not ship the date with the tool.
+    # I would recommend to move these column names to a config file similar to i18n strategies
+    consumptionPower = scalars.loc['Electric consumption NEFZ', 'value']
+    consumptionFuel = scalars.loc['Fuel consumption NEFZ', 'value']
 
     # initialize data set for filling up later on
     driveProfilesFuelAux = chargeMaxProfiles.copy()
     nHours = scalarsProc['noHours']
 
-    # review: have you considered naming idx into ihour as it actually contains the currently processed hour and would make the code more readable
-    for idx in range(nHours):
+    # review (resolved): have you considered naming idx into ihour as it actually contains the currently processed hour and would make the code more readable
+    for iHour in range(nHours):
         # review as far as I can tell, the hour 0 is never filled or added as a column to driveProfilesFuelAux. But this should raise an error in line 336 for idx 1. Why does this work anyhow?
-        if idx != 0:
-            driveProfilesFuelAux[str(idx)] = (consumptionFuel / consumptionPower) * \
-                                             (driveProfiles[str(idx)] * consumptionPower / 100 -
-                                              chargeProfilesUncontrolled[str(idx)] -
-                                              (chargeMaxProfiles[str(idx - 1)] - chargeMaxProfiles[str(idx)]))
+        if iHour != 0:
+            driveProfilesFuelAux[str(iHour)] = (consumptionFuel / consumptionPower) * \
+                                             (driveProfiles[str(iHour)] * consumptionPower / 100 -
+                                              chargeProfilesUncontrolled[str(iHour)] -
+                                              (chargeMaxProfiles[str(iHour - 1)] - chargeMaxProfiles[str(iHour)]))
+
     # Setting value of hour=0 equal to the average of hour=1 and last hour
-    driveProfilesFuelAux[str(0)] = (driveProfilesFuelAux[str(nHours - 1)] + driveProfilesFuelAux[str(1)])/2
+    driveProfilesFuelAux[str(0)] = (driveProfilesFuelAux[str(nHours - 1)] + driveProfilesFuelAux[str(1)]) / 2
     driveProfilesFuelAux = driveProfilesFuelAux.round(4)
     return driveProfilesFuelAux
+
 
 @logit
 def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuelAux, scalars, scalarsProc, nIter):
     #ToDo param minSecurityFactor
-    '''
+    """
     Calculates minimum SoC profiles assuming that the hourly mileage has to exactly be fulfilled but no battery charge
     is kept inspite of fulfilling the mobility demand. It represents the minimum charge that a vehicle battery has to
     contain in order to fulfill all trips.
@@ -194,33 +194,34 @@ def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuel
 
     :param chargeProfiles: Charging profiles with techno-economic assumptions on connection power.
     :param consumptionProfiles: Profiles giving consumed electricity for each trip in each hour assuming specified
-    consumption.
+        consumption.
     :param driveProfilesFuelAux: Auxilliary fuel demand for fulfilling trips if purely electric driving doesn't suffice.
     :param scalars: Techno-economic input assumptions such as consumption, battery capacity etc.
     :param scalarsProc: Number of profiles and number of hours of each profile.
     :param nIter: Gives the number of iterations to fulfill the boundary condition of the SoC equalling in the first
-    and in the last hour of the profile.
+        and in the last hour of the profile.
     :return: Returns an indexed DataFrame containing minimum SOC values for each profile in each hour in the same
-    format as chargeProfiles, consumptionProfiles and other input parameters.
+        format as chargeProfiles, consumptionProfiles and other input parameters.
+    """
 
-    '''
-
-    # review general remark: white spaces in column names give me the creeps as it is easy to mistype and create all kind of wired errors. Especially if there are columns with similar names only differing in whitespaces. This is clearly not the case here, but did you consider naming columns with underscores for easier reference?
+    # review general remark: white spaces in column names give me the creeps as it is easy to mistype
+    # and create all kind of wired errors.
+    # Especially if there are columns with similar names only differing in whitespaces.
+    # This is clearly not the case here, but did you consider naming columns with underscores for easier reference?
     chargeMinProfiles = chargeProfiles.copy()
-    batCapMin = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmin', 'value']
-    batCapMax = scalars.loc['Battery size', 'value'] * scalars.loc['SoCmax', 'value']
-    consElectric = scalars.loc['Verbrauch NEFZ CD', 'value']
-    consGasoline = scalars.loc['Verbrauch NEFZ CS', 'value']
+    batCapMin = scalars.loc['Battery capacity', 'value'] * scalars.loc['Minimum SOC', 'value']
+    batCapMax = scalars.loc['Battery capacity', 'value'] * scalars.loc['Maximum SOC', 'value']
+    consElectric = scalars.loc['Electric consumption NEFZ', 'value']
+    consGasoline = scalars.loc['Fuel consumption NEFZ', 'value']
     nHours = scalarsProc['noHours']
     idxIt = 1
     while idxIt <= nIter:
         for idx in range(nHours):
 
-            # testing line
-            # chargeMinProfiles.ix[3, '0'] = 15.0
-
-            # review the above nHours implies, that the number of hours can vary based on user input or the underlying data. It seems to me risky to hardcode 23 here if the last hour is meant. Would it not be more prudent to use a variable lastHour that is nHours-1?
-            if idx == 23:
+            # review (resolved) the above nHours implies, that the number of hours can vary based on user input or the
+            # underlying data. It seems to me risky to hardcode 23 here if the last hour is meant.
+            # Would it not be more prudent to use a variable lastHour that is nHours-1?
+            if idx == nHours-1:
                 chargeMinProfiles[str(idx)] = np.where(batCapMin <= chargeMinProfiles[str(idx)],
                                                        chargeMinProfiles[str(0)],
                                                        batCapMin)
@@ -239,28 +240,33 @@ def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuel
                                                        chargeMinProfiles[str(idx)],
                                                        batCapMax)
 
+        # FixMe Are these 2 lines of further use?
         devCrit = chargeMinProfiles[str(nHours - 1)].sum() - chargeMinProfiles[str(0)].sum()
         print(devCrit)
+
         idxIt += 1
     chargeMinProfiles.drop('newCharge', axis='columns', inplace=True)
     return chargeMinProfiles
 
+
 @logit
 def createRandNo(driveProfiles, setSeed=1):
-    # review for me the function name is not precise. The function creates to my understanding a random profile. If this is the case, I would name it accordingly.
-    '''
+    """
     Creates a random number between 0 and 1 for each profile based on driving profiles.
 
+    :param driveProfiles: Dataframe holding hourly electricity consumption values in kWh/h for all profiles
+    :param setSeed: Seed for reproducing stochasticity. Scalar number.
     :return: Returns an indexed series with the same indices as dirveProfiles with a random number between 0 and 1 for
     each index.
+    """
 
-    '''
     idxData = driveProfiles.copy()
     seed(setSeed)  # seed random number generator for reproducibility
     idxData['randNo'] = np.random.random(len(idxData))
     idxData['randNo'] = [random() for _ in range(len(idxData))]  # generate one random number for each profile / index
-    randNos = idxData.loc[:, 'randNo']
-    return randNos
+    randNo = idxData.loc[:, 'randNo']
+    return randNo
+
 
 @logit
 def calcProfileSelectors(chargeProfiles,
@@ -271,9 +277,7 @@ def calcProfileSelectors(chargeProfiles,
                          scalars,
                          fuelDriveTolerance,
                          isBEV):
-    # FIXME Maybe make this function neater by giving filtering functions as params or in a separate file??
-
-    '''
+    """
     This function calculates two filters. The first filter, filterCons, excludes profiles that depend on auxiliary
     fuel with an option of a tolerance and those that don't reach a minimum daily average for mileage.
     A second filter filterDSM excludes profiles where the battery doesn't suffice the mileage and those where charging
@@ -290,14 +294,13 @@ def calcProfileSelectors(chargeProfiles,
     :param isBEV: Boolean value. If true, more 2030 profiles are taken into account (in general).
     :return: The bool indices are written to one DataFrame in the DataManager with the columns randNo, indexCons and
     indexDSM and the same indices as the other profiles.
+    """
 
-    '''
-
-    boolBEV = scalars.loc['EREV oder BEV?', 'value']
+    boolBEV = scalars.loc['Is BEV?', 'value']
     minDailyMileage = scalars.loc['Minimum daily mileage', 'value']
-    batSize = scalars.loc['Battery size', 'value']
-    socMax = scalars.loc['SoCmax', 'value']
-    socMin = scalars.loc['SoCmin', 'value']
+    batSize = scalars.loc['Battery capacity', 'value']
+    socMax = scalars.loc['Maximum SOC', 'value']
+    socMin = scalars.loc['Minimum SOC', 'value']
     filterCons = driveProfiles.copy()
     filterCons['randNo'] = randNos
     filterCons['bolFuelDriveTolerance'] = driveProfilesFuelAux.sum(axis='columns') * \
@@ -319,55 +322,53 @@ def calcProfileSelectors(chargeProfiles,
     filterCons_out = filterCons.loc[:, ['randNo', 'indexCons', 'indexDSM']]
     return filterCons_out
 
+
 @logit
 def calcElectricPowerProfiles(consumptionProfiles, driveProfilesFuelAux, scalars, filterCons, scalarsProc,
                               filterIndex):
-    '''
+    """
     Calculates electric power profiles that serve as outflow of the fleet batteries.
 
     :param consumptionProfiles: Indexed DataFrame containing electric vehicle consumption profiles.
     :param driveProfilesFuelAux: Indexed DataFrame containing
-    :param scalars:
-    :param filterCons:
-    :param scalarsProc:
-    :param filterIndex:
-    :return:
-    :param dmgrName: 'electricPowerProfiles'
+    :param scalars: VencoPy Dataframe containing technical assumptions
+    :param filterCons: Dataframe containing one boolean filter value for each profile
+    :param scalarsProc: Dataframe containing meta information of input profiles
     :param filterIndex: Can be either 'indexCons' or 'indexDSM' so far. 'indexDSM' applies stronger filters and results
     are thus less representative.
-    :return: Returns electric demand from driving filtered and aggregated to one fleet. Stores the profile in the
-    Data Manager under the key specified by dmgrName.
-    '''
+    :return: Returns electric demand from driving filtered and aggregated to one fleet.
+    """
 
-    consumptionPower = scalars.loc['Verbrauch NEFZ CD', 'value']
-    consumptionFuel = scalars.loc['Verbrauch NEFZ CS', 'value']
+    consumptionPower = scalars.loc['Electric consumption NEFZ', 'value']
+    consumptionFuel = scalars.loc['Fuel consumption NEFZ', 'value']
     indexCons = filterCons.loc[:, 'indexCons']
     indexDSM = filterCons.loc[:, 'indexDSM']
-    # datalogger.info(indexCons)
     nHours = scalarsProc['noHours']
     electricPowerProfiles = consumptionProfiles.copy()
-    for idx in range(nHours):
-        electricPowerProfiles[str(idx)] = (consumptionProfiles[str(idx)] - driveProfilesFuelAux[str(idx)] *
+    for iHour in range(nHours):
+        electricPowerProfiles[str(iHour)] = (consumptionProfiles[str(iHour)] - driveProfilesFuelAux[str(iHour)] *
                                            (consumptionPower / consumptionFuel))
-
         if filterIndex == 'indexCons':
-            electricPowerProfiles[str(idx)] = electricPowerProfiles[str(idx)] * indexCons
+            electricPowerProfiles[str(iHour)] = electricPowerProfiles[str(iHour)] * indexCons
         elif filterIndex == 'indexDSM':
-            electricPowerProfiles[str(idx)] = electricPowerProfiles[str(idx)] * indexDSM
+            electricPowerProfiles[str(iHour)] = electricPowerProfiles[str(iHour)] * indexDSM
     return electricPowerProfiles
-    # datalogger.info(electricPowerProfiles)
+
 
 @logit
 def setUnconsideredBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons, minValue, maxValue):
-    '''
-    Sets all profile values with indexDSM = False to extreme values. For SoC max profiles, this means a value
+    """
+    Sets all profile values with filterCons = False to extreme values. For SoC max profiles, this means a value
     that is way higher than SoC max capacity. For SoC min this means usually 0. This setting is important for the
     next step of filtering out extreme values.
 
-    :param maxValue: Value that non-reasonable values of SoC max profiles should be set to.
+    :param chargeMaxProfiles: Dataframe containing hourly maximum SOC profiles for all profiles
+    :param chargeMinProfiles: Dataframe containing hourly minimum SOC profiles for all profiles
+    :param filterCons: Dataframe containing one boolean value for each profile
     :param minValue: Value that non-reasonable values of SoC min profiles should be set to.
+    :param maxValue: Value that non-reasonable values of SoC max profiles should be set to.
     :return: Writes the two profiles files 'chargeMaxProfilesDSM' and 'chargeMinProfilesDSM' to the DataManager.
-    '''
+    """
 
     chargeMinProfilesDSM = chargeMinProfiles.copy()
     chargeMaxProfilesDSM = chargeMaxProfiles.copy()
@@ -380,6 +381,7 @@ def setUnconsideredBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons,
         print("Declaration doesn't work. "
               "Maybe the length of filterCons differs from the length of chargeMaxProfiles")
     return chargeMaxProfilesDSM, chargeMinProfilesDSM
+
 
 @logit
 def indexFilter(chargeMaxProfiles, chargeMinProfiles, filterCons):
@@ -397,9 +399,10 @@ def indexFilter(chargeMaxProfiles, chargeMinProfiles, filterCons):
     profilesFilterDSMMax = chargeMinProfiles.loc[filterCons['indexDSM'], :]
     return profilesFilterConsMin, profilesFilterConsMax, profilesFilterDSMMin, profilesFilterDSMMax
 
+
 @logit
 def socProfileSelection(profilesMin, profilesMax, filter, alpha):
-    '''
+    """
     Selects the nth highest value for each hour for min (max profiles based on the percentage given in parameter
     'alpha'. If alpha = 10, the 10%-biggest (10%-smallest) value is selected, all other values are disregarded.
     Currently, in the Venco reproduction phase, the hourly values are selected independently of each other. min and max
@@ -410,7 +413,7 @@ def socProfileSelection(profilesMin, profilesMax, filter, alpha):
     :param filter: Filter method. Currently implemented: 'singleValue'
     :param alpha: Percentage, giving the amount of profiles whose mobility demand can not be fulfilled after selection.
     :return: Returns the two profiles 'SOCMax' and 'SOCMin' in the same time resolution as input profiles.
-    '''
+    """
 
     noProfiles = len(profilesMin)
     noProfilesFilter = int(alpha / 100 * noProfiles)
@@ -423,49 +426,55 @@ def socProfileSelection(profilesMin, profilesMax, filter, alpha):
         for col in profilesMax:
             profileMaxOut[col] = max(profilesMax[col].nsmallest(noProfilesFilter))
 
-    # elif params['filter'] == "profile"
-    # ToDo: Profile specific filtering
     else:
-        # review have you considered implementing your own error like class FilterError(Exception): pass which would give the user an additional hint on what went wrong?
+        # review have you considered implementing your own error like class FilterError(Exception):
+        # pass which would give the user an additional hint on what went wrong?
         raise ValueError('You selected a filter method that is not implemented.')
     return profileMinOut, profileMaxOut
 
+
 @logit
-def normalizeProfiles(scalars, socMin, socMax, normReference):
+def normalizeProfiles(scalars, socMin, socMax, normReferenceParam):
     # ToDo: Implement a normalization to the maximum of a given profile
 
-    '''
+    """
     Normalizes given profiles with a given scalar reference.
 
-    :param scalars: Input scalars for VencoPy for e.g. battery capacity
+    :param scalars: Dataframe containing technical assumptions e.g. battery capacity
     :param socMin: Minimum SOC profile subject to normalization
     :param socMax: Minimum SOC profile subject to normalization
-    :param normReference: Reference that is taken for normalization. This has to be given in scalar input data.
+    :param normReferenceParam: Reference parameter that is taken for normalization.
+    This has to be given in scalar input data and is most likely the battery capacity.
     :return: Writes the normalized profiles to the DataManager under the specified keys
-    '''
+    """
 
-    normReference = scalars.loc[normReference, 'value']
+    normReference = scalars.loc[normReferenceParam, 'value']
     try:
         socMinNorm = socMin.div(float(normReference))
         socMaxNorm = socMax.div(float(normReference))
 
     except ValueError:
         # review general if " is used instead of ' the escaping of \' is not necessary
-        # review general so is this not a problem at all if this happens? As I understand this code, socMin and socMax would be unchanged by this function call
+        # review general so is this not a problem at all if this happens?
+        # s I understand this code, socMin and socMax would be unchanged by this function call
         print('There was a value error. I don\'t know what to tell you.')
     return socMinNorm, socMaxNorm
 
+
 @logit
 def filterConsProfiles(profile, filterCons, critCol):
-    '''
+    """
     Filter out all profiles from given profile types whose boolean indices (so far DSM or cons) are FALSE.
 
-    :param profiles: profile identifiers given as list of strings referencing to DataManager keys
-    :param dmgrNames: Identifiers given as list of string to store filtered profiles back into the DataManager
+    :param profile: Dataframe of hourly values for all filtered profiles
+    :param filterCons: Identifiers given as list of string to store filtered profiles back into the DataManager
+    :param critCol:
     :return: Stores filtered profiles in the DataManager under keys given in dmgrNames
-    '''
+    """
 
-    # review general could the filterCons and critCol not be hardcoded or sotred in a hidden data structure, so that it has not to be passed directly between functions? A class could achieve this goal easily (providing a hidden data structure in the shape of an attribute) making the code more structured?
+    # review general could the filterCons and critCol not be hardcoded or sotred in a hidden data structure,
+    # so that it has not to be passed directly between functions? A class could achieve this goal
+    # easily (providing a hidden data structure in the shape of an attribute) making the code more structured?
     outputProfile = profile.loc[filterCons[critCol], :]
     return outputProfile
 
@@ -478,55 +487,57 @@ def considerProfiles(profiles, consider, colStart, colEnd, colCons):
     try:
             profilesOut = profiles[consider[colCons].astype('bool'), colStart: colEnd]
     except KeyError:
-        # review general: these are silent fails. How should the user react? Can this create a data problem downstream? Is this invalidating your results or is this nothing to bother at all? It is not clear from the error message. Also key is a bit unclear in this context.
+        # review general: these are silent fails. How should the user react? Can this create a data problem
+        # downstream? Is this invalidating your results or is this nothing to bother at all?
+        # It is not clear from the error message. Also key is a bit unclear in this context.
         print("Key Error. "
             "The key {} is not part of {}".format(colCons, consider))
     return profilesOut
 
+
 @logit
 def aggregateProfiles(profilesIn):
-    '''
-    This action aggregates all single-vehicle profiles that are considered to one fleet profile. There is a separate
-    action for the aggregation of plug profiles since it is not corrected by another driving cycle such as consumption
-    related profiles.
+    """
+    This method aggregates all single-vehicle profiles that are considered to one fleet profile.
 
-    :param profiles: DataManager key of the plug profiles subject to aggregation
-    :return: Writes profile to DataManager under the key 'chargeAvailProfile_out'
-    '''
+    :param profilesIn: Dataframe of hourly values of all filtered profiles
+    :return: Returns a Dataframe with hourly values for one aggregated profile
+    """
 
     # Typecasting is necessary for aggregation of boolean profiles
     profilesOut = profilesIn.iloc[0, :].astype('float64', copy=True)
     lenProfiles = len(profilesIn)
 
-    # review have you considered using pandas dataframe .T to transpose, use sum to get the sum of each column and then divide by lenProfiles? This would be more concise in writing and more performant than a python loop
+    # review have you considered using pandas dataframe .T to transpose,
+    # use sum to get the sum of each column and then divide by lenProfiles?
+    # This would be more concise in writing and more performant than a python loop
     for colidx in profilesIn:
         profilesOut[colidx] = sum(profilesIn.loc[:, colidx]) / lenProfiles
     return profilesOut
 
+
 @logit
-def correctProfiles(scalars, profiles, profType):
-    '''
-    This action scales given profiles by a correction factor. It was written for VencoPy scaling consumption data
+def correctProfiles(scalars, profile, profType):
+    """
+    This method scales given profiles by a correction factor. It was written for VencoPy scaling consumption data
     with the more realistic ARTEMIS driving cycle.
 
-    :param profiles: A list of strings giving the keys of the profile types that should be corrected according to the
-    ARTEMIS drive cycle.
+    :param scalars: Dataframe of technical assumptions
+    :param profile: Dataframe of profile that should be corrected
     :param profType: A list of strings specifying if the given profile type is an electric or a fuel profile.
     profType has to have the same length as profiles.
-    :param dmgrNames: List of strings specifying the keys under which the resulting profile types will be written to
-    the DataManager.
-    :return: Writes the corrected profiles to the DataManager under the keys given in dmgrNames
-    '''
+    :return:
+    """
 
-    profilesOut = profiles.copy()
+    profileOut = profile.copy()
     if profType == 'electric':
-        consumptionElectricNEFZ = scalars.loc['Verbrauch NEFZ CD', 'value']
-        consumptionElectricArtemis = scalars.loc['Verbrauch Artemis mit NV CD', 'value']
+        consumptionElectricNEFZ = scalars.loc['Electric consumption NEFZ', 'value']
+        consumptionElectricArtemis = scalars.loc['Electric consumption Artemis', 'value']
         corrFactor = consumptionElectricArtemis / consumptionElectricNEFZ
 
     elif profType == 'fuel':
-        consumptionFuelNEFZ = scalars.loc['Verbrauch NEFZ CS', 'value']
-        consumptionFuelArtemis = scalars.loc['Verbrauch Artemis mit NV CS', 'value']
+        consumptionFuelNEFZ = scalars.loc['Fuel consumption NEFZ', 'value']
+        consumptionFuelArtemis = scalars.loc['Fuel consumption Artemis', 'value']
         corrFactor = consumptionFuelArtemis / consumptionFuelNEFZ
 
     else:
@@ -536,7 +547,7 @@ def correctProfiles(scalars, profiles, profType):
     # review same like above:
     # review have you considered using pandas dataframe .T to transpose, use sum to get the sum of each column and
     # then divide by lenProfiles? This would be more concise in writing and more performant than a python loop
-    for colIdx in profiles.index:
-        profilesOut[colIdx] = corrFactor * profiles[colIdx]
-    return profilesOut
+    for colIdx in profile.index:
+        profileOut[colIdx] = corrFactor * profile[colIdx]
+    return profileOut
 
