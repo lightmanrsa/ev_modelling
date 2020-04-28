@@ -22,6 +22,7 @@ if __name__ == '__main__':
     linkConfig = './config/config.yaml'
     config = yaml.load(open(linkConfig), Loader=yaml.SafeLoader)
     linkDict, scalars, driveProfilesRaw, plugProfilesRaw = readVencoInput(config)
+    outputConfig = yaml.load(open(linkDict['linkOutputConfig']))
     indices = ['CASEID', 'PKWID']
     driveProfiles, plugProfiles = indexProfile(driveProfilesRaw, plugProfilesRaw, indices)
     scalarsProc = procScalars(driveProfilesRaw, plugProfilesRaw, driveProfiles, plugProfiles)
@@ -91,7 +92,7 @@ if __name__ == '__main__':
                                          filter='singleValue', alpha=1)
 
     socMinNorm, socMaxNorm = normalizeProfiles(scalars, SOCMin, SOCMax,
-                                               normReference='Battery size')
+                                               normReferenceParam='Battery capacity')
 
     plugProfilesCons = filterConsProfiles(plugProfiles, profileSelectors, critCol='indexCons')
     electricPowerProfilesCons = filterConsProfiles(electricPowerProfiles, profileSelectors, critCol='indexCons')
@@ -107,22 +108,37 @@ if __name__ == '__main__':
     electricPowerProfilesCorr = correctProfiles(scalars, electricPowerProfilesAgg, 'electric')
     driveProfilesFuelAuxCorr = correctProfiles(scalars, driveProfilesFuelAuxAgg, 'fuel')
 
-    cloneAndWriteProfiles(socMinNorm, linkDict, 8760, technologyLabel='BEV-S',
+    profileDictOut = dict(uncontrolledCharging=chargeProfilesUncontrolledCorr,
+                          electricityDemandDriving=electricPowerProfilesCorr, SOCMax=socMaxNorm, SOCMin=socMinNorm,
+                          gridConnectionShare=plugProfilesAgg)
+
+    writeProfilesToCSV(linkDict['linkOutput'],
+                       profileDictOut,
+                       singleFile=False,
+                       strAdd='')
+
+    cloneAndWriteProfiles(socMinNorm, outputConfig, outputLink=linkDict['linkOutputAnnual'],
+                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
                           filename='BEV_S_SOCMin_VencoPy_MR1_alpha1_batCap40_cons15')
 
-    cloneAndWriteProfiles(socMaxNorm, linkDict, 8760, technologyLabel='BEV-S',
+    cloneAndWriteProfiles(socMaxNorm, outputConfig, outputLink=linkDict['linkOutputAnnual'],
+                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
                           filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
 
-    cloneAndWriteProfiles(chargeProfilesUncontrolledCorr, linkDict, 8760, technologyLabel='BEV-S',
+    cloneAndWriteProfiles(chargeProfilesUncontrolledCorr, outputConfig, outputLink=linkDict['linkOutputAnnual'],
+                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
                           filename='BEV_S_chargeUncontrolled_VencoPy_MR1_alpha1_batCap40_cons15')
 
-    cloneAndWriteProfiles(electricPowerProfilesCorr, linkDict, 8760, technologyLabel='BEV-S',
+    cloneAndWriteProfiles(electricPowerProfilesCorr, outputConfig, outputLink=linkDict['linkOutputAnnual'],
+                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
                           filename='BEV_S_drivePower_VencoPy_MR1_alpha1_batCap40_cons15')
 
-    cloneAndWriteProfiles(driveProfilesFuelAuxCorr, linkDict, 8760, technologyLabel='BEV-S',
+    cloneAndWriteProfiles(driveProfilesFuelAuxCorr, outputConfig, outputLink=linkDict['linkOutputAnnual'],
+                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
                           filename='BEV_S_driveAuxFuel_VencoPy_MR1_alpha1_batCap40_cons15')
 
-    cloneAndWriteProfiles(plugProfilesAgg, linkDict, 8760, technologyLabel='BEV-S',
+    cloneAndWriteProfiles(plugProfilesAgg, outputConfig, outputLink=linkDict['linkOutputAnnual'],
+                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
                           filename='BEV_S_plugProfile_VencoPy_MR1_alpha1_batCap40_cons15')
 
     #linePlot(profiles, show=True, write=True, stradd='MR1_alpha1_batCap40_cons15')

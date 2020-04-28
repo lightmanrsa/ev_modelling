@@ -377,9 +377,12 @@ def setUnconsideredBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons,
     try:
         chargeMinProfilesDSM.loc[~filterCons['indexDSM'].astype('bool'), :] = minValue
         chargeMaxProfilesDSM.loc[~filterCons['indexDSM'].astype('bool'), :] = maxValue
-    except:
+    except Exception as E:
         print("Declaration doesn't work. "
               "Maybe the length of filterCons differs from the length of chargeMaxProfiles")
+        raise E
+        # raise user defined
+
     return chargeMaxProfilesDSM, chargeMinProfilesDSM
 
 

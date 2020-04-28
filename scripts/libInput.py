@@ -30,16 +30,16 @@ def initializeLinkMgr(vencoConfig):
 
     :return: Returns link dictionary with relative links to input data and output folders.
     """
-    linkDict_out = {'linkScalars': vencoConfig['linksRelative']['input'] + vencoConfig['files']['inputDataScalars'],
+    linkDict = {'linkScalars': vencoConfig['linksRelative']['input'] + vencoConfig['files']['inputDataScalars'],
                     'linkDriveProfiles': vencoConfig['linksRelative']['input'] + vencoConfig['files'][
                         "inputDataDriveProfiles"],
                     'linkPlugProfiles': vencoConfig['linksRelative']['input'] + vencoConfig['files'][
                         "inputDataPlugProfiles"],
-                    'linkTSConfig': vencoConfig['linksRelative']['tsConfig'],
-                    'linkTSREMix': vencoConfig['linksRelative']['resultsAnnual'],
+                    'linkOutputConfig': vencoConfig['linksRelative']['outputConfig'],
+                    'linkOutputAnnual': vencoConfig['linksRelative']['resultsAnnual'],
                     'linkPlots': vencoConfig['linksRelative']['plots'],
                     'linkOutput': vencoConfig['linksRelative']['resultsDaily']}
-    return linkDict_out
+    return linkDict
 
 
 @logit

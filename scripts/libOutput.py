@@ -6,7 +6,7 @@ __email__ = 'Niklas.Wulff@dlr.de'
 __birthdate__ = '24.02.2019'
 __status__ = 'test'  # options are: dev, test, prod
 
-# This script holds the function definitions for output processing of calaculated profiles from VencoPy.
+# This script holds the function definitions for output writing and plotting of calaculated profiles from VencoPy.
 
 import numpy as np
 import yaml
@@ -14,8 +14,9 @@ import pandas as pd
 from .libLogging import logit
 from .libLogging import logger
 
+
 @logit
-def cloneAndWriteProfiles(profile, linkDict, noOfHoursOutput, technologyLabel, filename):
+def cloneAndWriteProfiles(profile, outputConfig, outputLink, noOfHoursOutput, technologyLabel, filename):
     """
     This action clones daily profiles to cover the specified time horizon given in noOfHoursOutput.
 
@@ -27,13 +28,7 @@ def cloneAndWriteProfiles(profile, linkDict, noOfHoursOutput, technologyLabel, f
     :return: None.
     """
 
-    dfProfile = pd.DataFrame(profile).iloc[:, 0]
-
-    # initialize config
-    cfg = yaml.load(open(linkDict['linkTSConfig']))
-    linkRmx = linkDict['linkTSREMix']
-
-    df = createEmptyDataFrame(technologyLabel, noOfHoursOutput, cfg['Nodes'])
+    df = createEmptyDataFrame(technologyLabel, noOfHoursOutput, outputConfig['Nodes'])
     # review is this correct? What happens when noOfHoursOutput/len(profile) is smaller then 0? Then noOfClones
     # would be negative and I am not sure if this would be coerced to 0 by the following int type cast later on.
     # Is this handled upstream in the call chain?
@@ -50,10 +45,10 @@ def cloneAndWriteProfiles(profile, linkDict, noOfHoursOutput, technologyLabel, f
     # FixMe this .copy() seems to be redundant if createEmptyDataFrame above indeed creates a fresh new empty
     # dataframe. Am I missing something here?
     profilesOut = df.copy()
-    for i in cfg['NonNullNodes']:
+    for i in outputConfig['NonNullNodes']:
         profilesOut.loc[:, i] = np.round(profileCloned, 3)
 
-    profilesOut.to_csv(linkRmx + '/' + filename + '.csv', index=False)
+    profilesOut.to_csv(outputLink + '/' + filename + '.csv', index=False)
 
 
 @logit
@@ -97,24 +92,26 @@ def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
 
 
 @logit
-def writeProfilesToCSV(dmgr, config, params):
-    # ADD DOCSTRING AFTER CORRECTIONS
+def writeProfilesToCSV(outputFolder, profileDictOut, singleFile=True, strAdd=''):
+    """
+    Function to write VencoPy profiles to either one or five .csv files in the output folder specified in outputFolder.
 
-    length = {}
-    data = []
-    for iprof in params['dmgrKeys']:
-        data.append(dmgr[iprof])
-        length[iprof] = len(dmgr[iprof])
+    :param outputFolder: Link to output folder
+    :param profileDictOut: Dictionary with profile names in keys and profiles as pd.Series containing a VencoPy
+    profile each to be written in value
+    :param singleFile: If True, all profiles will be appended and written to one .csv file. If False, five files are
+    written
+    :param strAdd: String addition for filenames
+    :return: None
+    """
 
-    data_df = pd.concat(data, axis=1)
-    data_df.columns = params['dmgrKeys']
+    if singleFile:
+        dataOut = pd.DataFrame(profileDictOut)
+        dataOut.to_csv(outputFolder + 'vencoOutput' + strAdd + '.csv')
+    else:
+        for iName, iProf in profileDictOut.items():
+            iProf.to_csv(outputFolder + 'vencoOutput_' + iName + strAdd + '.csv')
 
-    if params['outputFormat'] == 'singleFile':
-        data_df.to_csv(dmgr['linkDict']['linkOutput'] + 'vencoOutput_' + params['stradd'] + '.csv')
-    elif params['outputFormat' == 'multiFile']:
-        for iprof in params['dmgrKeys']:
-            prof = dmgr[iprof]
-            prof.to_csv(dmgr['linkDict']['linkOutput'] + '/vencoOutput' + iprof + params['stradd'] + '.csv')
 
 @logit
 def appendOutputProfiles(dmgr, config, params):
@@ -148,6 +145,7 @@ def appendOutputProfiles(dmgr, config, params):
                                path_or_buf=params['outputDir'] + params['outputPre'] +
                                            key + params['outputPost'] + '.csv',
                                float_format = '%.3f')
+
 
 @logit
 def composeStringDict(pre, name, post):
