@@ -10,7 +10,7 @@ from scripts.libInput import *
 from scripts.libPreprocessing import *
 from scripts.libProfileCalculation import *
 from scripts.libOutput import *
-from scripts.plotting import *
+from scripts.libPlotting import *
 from scripts.libLogging import logit
 
 
@@ -110,36 +110,17 @@ if __name__ == '__main__':
 
     profileDictOut = dict(uncontrolledCharging=chargeProfilesUncontrolledCorr,
                           electricityDemandDriving=electricPowerProfilesCorr, SOCMax=socMaxNorm, SOCMin=socMinNorm,
-                          gridConnectionShare=plugProfilesAgg)
+                          gridConnectionShare=plugProfilesAgg, auxFuelDriveProfile=driveProfilesFuelAuxCorr)
 
     writeProfilesToCSV(linkDict['linkOutput'],
                        profileDictOut,
                        singleFile=False,
                        strAdd='')
 
-    cloneAndWriteProfiles(socMinNorm, outputConfig, outputLink=linkDict['linkOutputAnnual'],
-                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
-                          filename='BEV_S_SOCMin_VencoPy_MR1_alpha1_batCap40_cons15')
+    # writeAnnualOutputForREMix(profileDictOut, outputConfig, linkDict['linkOutputAnnual'],
+    #                         config['postprocessing']['hoursClone'], config['labels']['technologyLabel'],
+    #                         strAdd='_MR1_alpha1_batCap40_cons15')
 
-    cloneAndWriteProfiles(socMaxNorm, outputConfig, outputLink=linkDict['linkOutputAnnual'],
-                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
-                          filename='BEV_S_SOCMax_VencoPy_MR1_alpha1_batCap40_cons15')
-
-    cloneAndWriteProfiles(chargeProfilesUncontrolledCorr, outputConfig, outputLink=linkDict['linkOutputAnnual'],
-                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
-                          filename='BEV_S_chargeUncontrolled_VencoPy_MR1_alpha1_batCap40_cons15')
-
-    cloneAndWriteProfiles(electricPowerProfilesCorr, outputConfig, outputLink=linkDict['linkOutputAnnual'],
-                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
-                          filename='BEV_S_drivePower_VencoPy_MR1_alpha1_batCap40_cons15')
-
-    cloneAndWriteProfiles(driveProfilesFuelAuxCorr, outputConfig, outputLink=linkDict['linkOutputAnnual'],
-                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
-                          filename='BEV_S_driveAuxFuel_VencoPy_MR1_alpha1_batCap40_cons15')
-
-    cloneAndWriteProfiles(plugProfilesAgg, outputConfig, outputLink=linkDict['linkOutputAnnual'],
-                          noOfHoursOutput=config['postprocessing']['hoursClone'], technologyLabel='BEV-S',
-                          filename='BEV_S_plugProfile_VencoPy_MR1_alpha1_batCap40_cons15')
-
-    #linePlot(profiles, show=True, write=True, stradd='MR1_alpha1_batCap40_cons15')
+    linePlot(profileDictOut, linkOutput=linkDict['linkPlots'],
+             show=True, write=True, stradd='MR1_alpha1_batCap40_cons15')
 

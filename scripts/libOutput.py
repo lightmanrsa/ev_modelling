@@ -8,19 +8,40 @@ __status__ = 'test'  # options are: dev, test, prod
 
 # This script holds the function definitions for output writing and plotting of calaculated profiles from VencoPy.
 
+import os
 import numpy as np
 import yaml
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from .libLogging import logit
 from .libLogging import logger
 
 
 @logit
-def cloneAndWriteProfiles(profile, outputConfig, outputLink, noOfHoursOutput, technologyLabel, filename):
+def writeAnnualOutputForREMix(profileDict, outputConfig, outputLink, noOfHoursOutput, technologyLabel, strAdd):
+    """
+    Output wrapper function to call cloneAndWriteProfile once for each output profile.
+
+    :param profileDict: Dictionary holding profile names and profiles in pd.Series to be cloned and written
+    :param outputConfig: REMix specific configuration file holding model nodes
+    :param outputLink: link to output folder
+    :param noOfHoursOutput: Integer describing the number of hours that the profiles are cloned to
+    :param technologyLabel: String holding a REMix eCarsDtl technology label
+    :param strAdd: String addition for output writing
+    :return: None
+    """
+    for iName, iProf in profileDict.items():
+        filename = technologyLabel + '_' + iName + strAdd
+        cloneAndWriteProfile(iProf, outputConfig, outputLink, noOfHoursOutput, technologyLabel, filename)
+
+
+@logit
+def cloneAndWriteProfile(profile, outputConfig, outputLink, noOfHoursOutput, technologyLabel, filename):
     """
     This action clones daily profiles to cover the specified time horizon given in noOfHoursOutput.
 
-    :param profile: A VencoPy profile.
+    :param profileDict: A dictionary holding five VencoPy profiles as Series including their names as keys.
     :param linkDict: A VencoPy link dictionary.
     :param noOfHoursOutput: Number of hours to clone the daily profile to (for 1 (non-gap-)year set to 8760)
     :param technologyLabel: Technology (e.g. vehicle segment "BEV-S") label for the filename that is written.
@@ -114,45 +135,43 @@ def writeProfilesToCSV(outputFolder, profileDictOut, singleFile=True, strAdd='')
 
 
 @logit
-def appendOutputProfiles(dmgr, config, params):
+def appendREMixProfiles(pre, names, post, linkFiles, linkOutput, outputPre, outputPost):
+    """
+    REMix specific append functionality to integrate results of three different VencoPy-runs into one file per profile.
+
+    :param pre: String part before profile name
+    :param names: list of profile names
+    :param post: String part after profile name
+    :param linkFiles: Link to folder of files
+    :param linkOutput: Link to appended file
+    :param outputPre: String before profile name for output
+    :param outputPost: String after profile name for output
+    :return: None
     """
 
-    :param dmgr:
-    :param config:
-    :param params:
-    :return:
-    """
-    strDict = composeStringDict(params['pre'], params['names'], params['post'])
-    # review general these kind of prints can distract the user if the code is published, as there is no context
-    # to hint on what is displayed and why. Would it make sense to provide additional information or to remove it
-    # entirely?
-    print(strDict)
+    strDict = composeStringDict(pre, names, post)
     dataDict = {}
     for key, strList in strDict.items():
         dfList = []
         for strIdx in strList:
-            df = pd.read_csv(params['link'] + '/' + strIdx)
+            df = pd.read_csv(linkFiles + '/' + strIdx)
             df.ix[df.iloc[:, 0] == 'BEV', 0] = strIdx[0:5]
             df.rename(columns={'Unnamed: 1':' '}, inplace=True)
             dfList.append(df)
         dataDict[key] = dfList
-    print(dataDict)
 
     resultDict = {}
     for key, value in dataDict.items():
         resultDict[key] = pd.concat(value)
         resultDict[key].to_csv(index=False,
-                               path_or_buf=params['outputDir'] + params['outputPre'] +
-                                           key + params['outputPost'] + '.csv',
-                               float_format = '%.3f')
+                               path_or_buf=linkOutput + outputPre + key + outputPost + '.csv',
+                               float_format='%.3f')
 
 
 @logit
-def composeStringDict(pre, name, post):
+def composeStringDict(pre, names, post):
     dict = {}
-    # review name implies a single string name or alike, however the loop implies it to be a list of names.
-    # Would it be more precise if name would be renamed into names?
-    for nIdx in name:
+    for nIdx in names:
         listStr = []
         for preIdx, postIdx in zip(pre, post):
             str = preIdx + nIdx + postIdx + '.csv'
@@ -160,3 +179,15 @@ def composeStringDict(pre, name, post):
         dict[nIdx] = listStr
     return dict
 
+
+@logit
+def linePlot(profileDict, linkOutput, show=True, write=True, stradd=''):
+    fig, ax = plt.subplots()
+    for iKey, iVal in profileDict.items():
+        sns.lineplot(iVal.index, iVal, label=iKey, sort=False)
+    ax.set_xlabel('Hour')
+    ax.set_ylabel('Normalized profiles')
+    ax.legend(loc='upper center', ncol=2, bbox_to_anchor=(0.5, 1.1))
+    fn = os.path.join(linkOutput, stradd + '.png')
+    if show: plt.show()
+    if write: fig.savefig(fn)

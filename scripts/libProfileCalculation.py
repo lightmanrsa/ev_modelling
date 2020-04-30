@@ -471,13 +471,10 @@ def filterConsProfiles(profile, filterCons, critCol):
 
     :param profile: Dataframe of hourly values for all filtered profiles
     :param filterCons: Identifiers given as list of string to store filtered profiles back into the DataManager
-    :param critCol:
+    :param critCol: Criterium column for filtering
     :return: Stores filtered profiles in the DataManager under keys given in dmgrNames
     """
 
-    # review general could the filterCons and critCol not be hardcoded or sotred in a hidden data structure,
-    # so that it has not to be passed directly between functions? A class could achieve this goal
-    # easily (providing a hidden data structure in the shape of an attribute) making the code more structured?
     outputProfile = profile.loc[filterCons[critCol], :]
     return outputProfile
 
