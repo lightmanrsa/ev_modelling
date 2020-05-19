@@ -3,9 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="ecd0004f-94bb-43f5-9ca2-d220fe3ef765" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/libInput.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/libInput.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/libLogging.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/libLogging.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/libOutput.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/libOutput.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/libProfileCalculation.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/libProfileCalculation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/plotting.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/functions.rst" beforeDir="false" afterPath="$PROJECT_DIR$/source/functions.rst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/venco_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/venco_main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,34 +20,28 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/venco_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2760">
-              <caret line="120" column="13" selection-start-line="120" selection-start-column="13" selection-end-line="120" selection-end-column="13" />
+            <state relative-caret-position="140">
+              <caret line="30" column="37" lean-forward="true" selection-start-line="30" selection-start-column="37" selection-end-line="30" selection-end-column="37" />
               <folding>
-                <element signature="e#203#233#0" expanded="true" />
+                <element signature="e#232#262#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/scripts/libPlotting.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/scripts/libPreprocessing.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="768">
-              <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
+            <state relative-caret-position="312">
+              <caret line="15" column="63" selection-start-line="15" selection-start-column="63" selection-end-line="15" selection-end-column="63" />
               <folding>
-                <element signature="e#180#295#0" />
-                <element signature="e#715#873#0" />
-                <element signature="e#982#1408#0" />
-                <element signature="e#1484#1707#0" />
-                <element signature="e#1752#2097#0" />
-                <element signature="e#1788#2074#0" />
-                <element signature="e#2100#2211#0" />
-                <element signature="e#2391#3708#0" />
-                <element signature="e#3753#4972#0" />
-                <element signature="e#4013#4929#0" />
-                <element signature="e#4217#4422#0" />
-                <element signature="e#4559#4929#0" />
-                <element signature="e#4681#4810#0" />
+                <element signature="e#450#1311#0" />
+                <element signature="e#450#1147#1" />
+                <element signature="e#1407#2556#0" />
+                <element signature="e#1407#1894#1" />
+                <element signature="e#2088#2281#0" />
+                <element signature="e#2382#2533#0" />
+                <element signature="e#2396#2532#0" />
               </folding>
             </state>
           </provider>
@@ -55,44 +50,24 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config/config.yaml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="768">
-              <caret line="32" selection-start-line="32" selection-end-line="32" />
+            <state relative-caret-position="480">
+              <caret line="20" column="11" selection-start-line="20" selection-start-column="11" selection-end-line="20" selection-end-column="11" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/libInput.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="552">
-              <caret line="37" column="82" selection-start-line="37" selection-start-column="82" selection-end-line="37" selection-end-column="82" />
-              <folding>
-                <element signature="e#372#476#0" />
-                <element signature="e#652#874#1" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scripts/libProfileCalculation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4152">
-              <caret line="476" selection-start-line="476" selection-end-line="476" />
+            <state relative-caret-position="601">
+              <caret line="37" lean-forward="true" selection-start-line="37" selection-end-line="37" />
               <folding>
-                <element signature="e#205#298#0" />
-                <element signature="e#540#1572#0" />
+                <element signature="e#344#362#0" expanded="true" />
                 <element signature="e#540#977#1" />
-                <element signature="e#1030#1140#0" />
                 <element signature="e#1633#2305#0" />
                 <element signature="e#1633#2022#1" />
                 <element signature="e#2412#5874#0" />
                 <element signature="e#2412#3492#1" />
-                <element signature="e#3915#5768#0" />
-                <element signature="e#3915#3960#0" />
-                <element signature="e#4135#5423#0" />
-                <element signature="e#4135#4149#0" />
-                <element signature="e#4241#4476#0" />
                 <element signature="e#4511#5423#0" />
                 <element signature="e#5956#7334#0" />
                 <element signature="e#5956#6557#1" />
@@ -112,14 +87,68 @@
                 <element signature="e#12413#12519#0" />
                 <element signature="e#12755#12983#0" />
                 <element signature="e#13018#14062#0" />
+                <element signature="e#14406#15156#0" />
                 <element signature="e#14406#14820#1" />
                 <element signature="e#15490#18410#0" />
                 <element signature="e#15490#16839#1" />
                 <element signature="e#18575#20164#0" />
                 <element signature="e#18575#19313#1" />
                 <element signature="e#19679#20131#0" />
+                <element signature="e#20280#21866#0" />
                 <element signature="e#20280#21133#1" />
+                <element signature="e#21243#21361#0" />
+                <element signature="e#21438#21603#0" />
+                <element signature="e#21639#21811#0" />
+                <element signature="e#21645#21765#0" />
+                <element signature="e#21947#22635#0" />
+                <element signature="e#21947#22226#1" />
+                <element signature="e#22715#24419#0" />
+                <element signature="e#22715#23648#1" />
+                <element signature="e#23777#24106#0" />
+                <element signature="e#24126#24379#0" />
+                <element signature="e#24126#24217#0" />
+                <element signature="e#24501#25686#0" />
+                <element signature="e#24574#25119#1" />
+                <element signature="e#25199#25298#0" />
+                <element signature="e#25331#25652#0" />
+                <element signature="e#25331#25409#0" />
+                <element signature="e#25754#26278#0" />
+                <element signature="e#25754#26196#1" />
+                <element signature="e#26448#27010#0" />
+                <element signature="e#26604#26987#0" />
+                <element signature="e#26604#26703#0" />
+                <element signature="e#26904#26960#0" />
+                <element signature="e#27059#27854#0" />
+                <element signature="e#27059#27322#1" />
+                <element signature="e#27499#27567#0" />
+                <element signature="e#27917#29562#0" />
+                <element signature="e#27917#28392#1" />
+                <element signature="e#28465#28704#0" />
+                <element signature="e#28743#28958#0" />
+                <element signature="e#28978#29192#0" />
+                <element signature="e#29198#29223#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/scripts/libInput.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1440">
+              <caret line="64" column="41" selection-start-line="64" selection-start-column="41" selection-end-line="64" selection-end-column="41" />
+              <folding>
+                <element signature="e#278#289#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/scripts/libLogging.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="792">
+              <caret line="36" selection-start-line="36" selection-end-line="36" />
             </state>
           </provider>
         </entry>
@@ -127,20 +156,12 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/libOutput.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="492">
-              <caret line="182" column="6" lean-forward="true" selection-start-line="182" selection-start-column="6" selection-end-line="182" selection-end-column="6" />
+            <state relative-caret-position="1872">
+              <caret line="114" column="6" selection-start-line="114" selection-start-column="6" selection-end-line="114" selection-end-column="6" />
               <folding>
                 <element signature="e#321#330#0" expanded="true" />
+                <element signature="e#3377#5235#0" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config/outputConfigREMix.yaml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="12" column="23" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -150,15 +171,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="120">
               <caret line="5" selection-start-line="5" selection-end-line="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/scripts/libLogging.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="744">
-              <caret line="34" selection-start-line="34" selection-end-line="34" />
             </state>
           </provider>
         </entry>
@@ -189,6 +201,8 @@
       <find>linePlot</find>
       <find>filterCons</find>
       <find>namesList</find>
+      <find>SlidesExporter</find>
+      <find>@logit</find>
     </findStrings>
     <replaceStrings>
       <replace>Agg</replace>
@@ -196,6 +210,7 @@
       <replace>config</replace>
       <replace>/</replace>
       <replace>iHour</replace>
+      <replace>@logit(level=Level.DEBUG)</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -209,11 +224,13 @@
         <option value="$PROJECT_DIR$/scripts/libPreprocessing.py" />
         <option value="$PROJECT_DIR$/scripts/timeseriesREMix.yaml" />
         <option value="$PROJECT_DIR$/config/outputConfigREMix.yaml" />
-        <option value="$PROJECT_DIR$/scripts/libInput.py" />
         <option value="$PROJECT_DIR$/config/config.yaml" />
-        <option value="$PROJECT_DIR$/scripts/libProfileCalculation.py" />
         <option value="$PROJECT_DIR$/scripts/plotting.py" />
         <option value="$PROJECT_DIR$/scripts/libPlotting.py" />
+        <option value="$PROJECT_DIR$/scripts/libInput.py" />
+        <option value="$USER_HOME$/.jupyter/jupyter_nbconvert_config.py" />
+        <option value="$PROJECT_DIR$/scripts/libProfileCalculation.py" />
+        <option value="$PROJECT_DIR$/scripts/libLogging.py" />
         <option value="$PROJECT_DIR$/venco_main.py" />
         <option value="$PROJECT_DIR$/scripts/libOutput.py" />
       </list>
@@ -230,10 +247,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="1936" />
-    <option name="height" value="1056" />
+    <option name="x" value="-7" />
+    <option name="width" value="974" />
+    <option name="height" value="1047" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -247,11 +263,6 @@
               <item name="vencopy_repo" type="b2602c69:ProjectViewProjectNode" />
               <item name="vencopy_repo" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="vencopy_repo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vencopy_repo" type="462c0819:PsiDirectoryNode" />
-              <item name="scripts" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -261,7 +272,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../REMix-OaM/OptiMo/projects/wulf_ni/remix4ever/interface" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../emobpy_codebase" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RunDashboard">
@@ -343,10 +354,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49052396" visible="true" weight="0.15279241" />
-      <window_info id="Structure" order="1" sideWeight="0.509476" side_tool="true" visible="true" weight="0.15279241" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4871795" visible="true" weight="0.15279241" />
+      <window_info id="Structure" order="1" sideWeight="0.51282054" side_tool="true" visible="true" weight="0.15279241" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32914925" />
@@ -533,9 +543,53 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/timeseriesREMix.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="5" column="24" lean-forward="true" selection-start-line="5" selection-start-column="24" selection-end-line="5" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/plotting.py" />
+    <entry file="file://$PROJECT_DIR$/config/outputConfigREMix.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="12" column="23" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.jupyter/jupyter_nbconvert_config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="427">
+          <caret line="265" column="41" selection-start-line="265" selection-start-column="41" selection-end-line="265" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/libPlotting.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
+          <folding>
+            <element signature="e#180#295#0" />
+            <element signature="e#715#873#0" />
+            <element signature="e#982#1408#0" />
+            <element signature="e#1484#1707#0" />
+            <element signature="e#1752#2097#0" />
+            <element signature="e#1788#2074#0" />
+            <element signature="e#2100#2211#0" />
+            <element signature="e#2391#3708#0" />
+            <element signature="e#3753#4972#0" />
+            <element signature="e#4013#4929#0" />
+            <element signature="e#4217#4422#0" />
+            <element signature="e#4559#4929#0" />
+            <element signature="e#4681#4810#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/libPreprocessing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="281">
+        <state relative-caret-position="312">
           <caret line="15" column="63" selection-start-line="15" selection-start-column="63" selection-end-line="15" selection-end-column="63" />
           <folding>
             <element signature="e#450#1311#0" />
@@ -549,60 +603,83 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/timeseriesREMix.yaml">
+    <entry file="file://$PROJECT_DIR$/scripts/libInput.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="5" column="24" lean-forward="true" selection-start-line="5" selection-start-column="24" selection-end-line="5" selection-end-column="24" />
+        <state relative-caret-position="1440">
+          <caret line="64" column="41" selection-start-line="64" selection-start-column="41" selection-end-line="64" selection-end-column="41" />
+          <folding>
+            <element signature="e#278#289#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/plotting.py" />
-    <entry file="file://$PROJECT_DIR$/venco_main.py">
+    <entry file="file://$PROJECT_DIR$/scripts/libLogging.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2760">
-          <caret line="120" column="13" selection-start-line="120" selection-start-column="13" selection-end-line="120" selection-end-column="13" />
+        <state relative-caret-position="792">
+          <caret line="36" selection-start-line="36" selection-end-line="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/libOutput.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1872">
+          <caret line="114" column="6" selection-start-line="114" selection-start-column="6" selection-end-line="114" selection-end-column="6" />
           <folding>
-            <element signature="e#203#233#0" expanded="true" />
+            <element signature="e#321#330#0" expanded="true" />
+            <element signature="e#3377#5235#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/utilsParsing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="5" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/lib.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5256">
+          <caret line="221" column="26" selection-start-line="221" selection-start-column="26" selection-end-line="221" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../advancedPython/advanced-python-course/lectures/l4_decorators_and_recursion/lecture.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config/config.yaml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="768">
-          <caret line="32" selection-start-line="32" selection-end-line="32" />
+        <state relative-caret-position="480">
+          <caret line="20" column="11" selection-start-line="20" selection-start-column="11" selection-end-line="20" selection-end-column="11" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/libInput.py">
+    <entry file="file://$PROJECT_DIR$/venco_main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="552">
-          <caret line="37" column="82" selection-start-line="37" selection-start-column="82" selection-end-line="37" selection-end-column="82" />
+        <state relative-caret-position="140">
+          <caret line="30" column="37" lean-forward="true" selection-start-line="30" selection-start-column="37" selection-end-line="30" selection-end-column="37" />
           <folding>
-            <element signature="e#372#476#0" />
-            <element signature="e#652#874#1" />
+            <element signature="e#232#262#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/scripts/libProfileCalculation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4152">
-          <caret line="476" selection-start-line="476" selection-end-line="476" />
+        <state relative-caret-position="601">
+          <caret line="37" lean-forward="true" selection-start-line="37" selection-end-line="37" />
           <folding>
-            <element signature="e#205#298#0" />
-            <element signature="e#540#1572#0" />
+            <element signature="e#344#362#0" expanded="true" />
             <element signature="e#540#977#1" />
-            <element signature="e#1030#1140#0" />
             <element signature="e#1633#2305#0" />
             <element signature="e#1633#2022#1" />
             <element signature="e#2412#5874#0" />
             <element signature="e#2412#3492#1" />
-            <element signature="e#3915#5768#0" />
-            <element signature="e#3915#3960#0" />
-            <element signature="e#4135#5423#0" />
-            <element signature="e#4135#4149#0" />
-            <element signature="e#4241#4476#0" />
             <element signature="e#4511#5423#0" />
             <element signature="e#5956#7334#0" />
             <element signature="e#5956#6557#1" />
@@ -622,73 +699,46 @@
             <element signature="e#12413#12519#0" />
             <element signature="e#12755#12983#0" />
             <element signature="e#13018#14062#0" />
+            <element signature="e#14406#15156#0" />
             <element signature="e#14406#14820#1" />
             <element signature="e#15490#18410#0" />
             <element signature="e#15490#16839#1" />
             <element signature="e#18575#20164#0" />
             <element signature="e#18575#19313#1" />
             <element signature="e#19679#20131#0" />
+            <element signature="e#20280#21866#0" />
             <element signature="e#20280#21133#1" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/outputConfigREMix.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="12" column="23" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/utilsParsing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/libLogging.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="744">
-          <caret line="34" selection-start-line="34" selection-end-line="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/lib.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5256">
-          <caret line="221" column="26" selection-start-line="221" selection-start-column="26" selection-end-line="221" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/libOutput.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="492">
-          <caret line="182" column="6" lean-forward="true" selection-start-line="182" selection-start-column="6" selection-end-line="182" selection-end-column="6" />
-          <folding>
-            <element signature="e#321#330#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/libPlotting.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="768">
-          <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
-          <folding>
-            <element signature="e#180#295#0" />
-            <element signature="e#715#873#0" />
-            <element signature="e#982#1408#0" />
-            <element signature="e#1484#1707#0" />
-            <element signature="e#1752#2097#0" />
-            <element signature="e#1788#2074#0" />
-            <element signature="e#2100#2211#0" />
-            <element signature="e#2391#3708#0" />
-            <element signature="e#3753#4972#0" />
-            <element signature="e#4013#4929#0" />
-            <element signature="e#4217#4422#0" />
-            <element signature="e#4559#4929#0" />
-            <element signature="e#4681#4810#0" />
+            <element signature="e#21243#21361#0" />
+            <element signature="e#21438#21603#0" />
+            <element signature="e#21639#21811#0" />
+            <element signature="e#21645#21765#0" />
+            <element signature="e#21947#22635#0" />
+            <element signature="e#21947#22226#1" />
+            <element signature="e#22715#24419#0" />
+            <element signature="e#22715#23648#1" />
+            <element signature="e#23777#24106#0" />
+            <element signature="e#24126#24379#0" />
+            <element signature="e#24126#24217#0" />
+            <element signature="e#24501#25686#0" />
+            <element signature="e#24574#25119#1" />
+            <element signature="e#25199#25298#0" />
+            <element signature="e#25331#25652#0" />
+            <element signature="e#25331#25409#0" />
+            <element signature="e#25754#26278#0" />
+            <element signature="e#25754#26196#1" />
+            <element signature="e#26448#27010#0" />
+            <element signature="e#26604#26987#0" />
+            <element signature="e#26604#26703#0" />
+            <element signature="e#26904#26960#0" />
+            <element signature="e#27059#27854#0" />
+            <element signature="e#27059#27322#1" />
+            <element signature="e#27499#27567#0" />
+            <element signature="e#27917#29562#0" />
+            <element signature="e#27917#28392#1" />
+            <element signature="e#28465#28704#0" />
+            <element signature="e#28743#28958#0" />
+            <element signature="e#28978#29192#0" />
+            <element signature="e#29198#29223#0" />
           </folding>
         </state>
       </provider>

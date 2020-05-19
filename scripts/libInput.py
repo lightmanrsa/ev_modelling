@@ -12,14 +12,7 @@ import yaml
 import pandas as pd
 from .libLogging import logit
 from .libLogging import logger
-
-# ToDo: Explicit strings from current Excel file in the code. Is it possible to implement that better???
-
-# @logit
-# def readVencoConfig(cfgLink):
-#     config = yaml.load(open(cfgLink), Loader=yaml.SafeLoader)
-#     return config
-
+from enum import Enum, auto
 
 @logit
 def initializeLinkMgr(vencoConfig):
@@ -42,6 +35,18 @@ def initializeLinkMgr(vencoConfig):
     return linkDict
 
 
+class Assumptions(Enum):
+    minDailyMileage = auto()
+    batteryCapacity = auto()
+    electricConsumption = auto()
+    fuelConsumption = auto()
+    electricConsumptionCorr = auto()
+    fuelConsumptionCorr = auto()
+    maximumSOC = auto()
+    minimumSOC = auto()
+    powerChargingStation = auto()
+    isBEV = auto()
+
 @logit
 def readInputScalar(filePath):
     """
@@ -53,6 +58,7 @@ def readInputScalar(filePath):
         second one holds units.
     """
 
+    scalarInput = Assumptions
     inputRaw = pd.read_excel(filePath,
                               header=5,
                               usecols="A:C",
@@ -108,7 +114,7 @@ def readInputBoolean(filePath):
 def readVencoInput(config):
     """
     Initializing action for VencoPy-specific config-file, link dictionary and data read-in. The config file has
-    to be a dictionary in a .yaml file containing three categories: linksRelative, linksAbsolute and files. Each c
+    to be a dictionary in a .yaml file containing three categories: linksRelative, linksAbsolute and files. Each
     category must contain itself a dictionary with the linksRelative to data, functions, plots, scripts, config and
     tsConfig. Absolute links should contain the path to the output folder. Files should contain a link to scalar input
     data, and the two timeseries files inputDataDriveProfiles and inputDataPlugProfiles.

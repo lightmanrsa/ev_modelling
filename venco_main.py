@@ -3,6 +3,7 @@ __maintainer__ = 'Niklas Wulff'
 __email__ = 'Niklas.Wulff@dlr.de'
 __birthdate__ = '03.11.2019'
 __status__ = 'dev'  # options are: dev, test, prod
+__license__ = 'BSD-3-Clause'
 
 
 #----- imports & packages ------
@@ -22,7 +23,7 @@ if __name__ == '__main__':
     linkConfig = './config/config.yaml'
     config = yaml.load(open(linkConfig), Loader=yaml.SafeLoader)
     linkDict, scalars, driveProfilesRaw, plugProfilesRaw = readVencoInput(config)
-    outputConfig = yaml.load(open(linkDict['linkOutputConfig']))
+    outputConfig = yaml.load(open(linkDict['linkOutputConfig']), Loader=yaml.SafeLoader)
     indices = ['CASEID', 'PKWID']
     driveProfiles, plugProfiles = indexProfile(driveProfilesRaw, plugProfilesRaw, indices)
     scalarsProc = procScalars(driveProfilesRaw, plugProfilesRaw, driveProfiles, plugProfiles)

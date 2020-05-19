@@ -128,10 +128,10 @@ def writeProfilesToCSV(outputFolder, profileDictOut, singleFile=True, strAdd='')
 
     if singleFile:
         dataOut = pd.DataFrame(profileDictOut)
-        dataOut.to_csv(outputFolder + 'vencoOutput' + strAdd + '.csv')
+        dataOut.to_csv(outputFolder + 'vencoOutput' + strAdd + '.csv', header=True)
     else:
         for iName, iProf in profileDictOut.items():
-            iProf.to_csv(outputFolder + 'vencoOutput_' + iName + strAdd + '.csv')
+            iProf.to_csv(outputFolder + 'vencoOutput_' + iName + strAdd + '.csv', header=True)
 
 
 @logit

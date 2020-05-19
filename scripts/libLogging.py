@@ -13,11 +13,12 @@ import inspect
 import logging.handlers
 
 logger = logging.getLogger('debugger')
+logger.setLevel(logging.INFO)
 h = logging.handlers.RotatingFileHandler('./debug.log')
 logger.addHandler(h)
 h = logging.StreamHandler()
 logger.addHandler(h)
-logger.setLevel('DEBUG')
+
 
 
 def logit(f):

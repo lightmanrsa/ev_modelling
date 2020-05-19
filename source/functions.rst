@@ -16,10 +16,18 @@ venco_main, venco and plotting.
 .. automodule:: venco_main
     :members:
 
-.. automodule:: venco
+.. automodule:: scripts.libInput
     :members:
 
-.. automodule:: plotting
+.. automodule:: scripts.libPreprocessing
     :members:
     
+.. automodule:: scripts.libProfileCalculation
+    :members:
+
+.. automodule:: scripts.libOutput
+    :members:
+
+.. automodule:: scripts.libLogging
+    :members:
 
