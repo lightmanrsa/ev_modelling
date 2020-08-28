@@ -4,9 +4,17 @@
 /__pycache__
 /scripts/__pycache__
 
-# old files and folders
+# local outputs
+/output/*
+!/output/.gitkeep
+
+# old or irrelevant files and folders
 /archive
-/lib.py
+/scripts/lib.py
+/inputData/emobpyData
+/inputData/archive
+/presentation/archive
+/JupyterNotebooks
 
 # files still in process
 /scripts/libPlotting.py
