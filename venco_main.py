@@ -1,4 +1,4 @@
-__version__ = '0.0.7'
+__version__ = '0.0.8'
 __maintainer__ = 'Niklas Wulff'
 __email__ = 'Niklas.Wulff@dlr.de'
 __birthdate__ = '03.11.2019'
@@ -12,15 +12,14 @@ from scripts.libPreprocessing import *
 from scripts.libProfileCalculation import *
 from scripts.libOutput import *
 from scripts.libPlotting import *
-from scripts.libLogging import logit
-
+from scripts.libLogging import logger
+import pathlib
 
 #ToDo: Maybe consolidate selection actions to one aggregation and one filtering action
 
 if __name__ == '__main__':
     #----- data and config read-in -----
-    # REVIEW Have you considered to use the pathlib? So far not, lets discuss!
-    linkConfig = './config/config.yaml'
+    linkConfig = pathlib.Path.cwd() / 'config' / 'config.yaml'  # pathLib syntax for windows, max, linux compatibility, see https://realpython.com/python-pathlib/ for an intro
     config = yaml.load(open(linkConfig), Loader=yaml.SafeLoader)
     linkDict, scalars, driveProfilesRaw, plugProfilesRaw = readVencoInput(config)
     outputConfig = yaml.load(open(linkDict['linkOutputConfig']), Loader=yaml.SafeLoader)
@@ -30,8 +29,6 @@ if __name__ == '__main__':
 
     consumptionProfiles = calcConsumptionProfiles(driveProfiles, scalars)
 
-    # REVIEW (resolved) the return value of the function implies multiple profiles while the function name implies
-    # only one is calculated. I suggest changing the naming to reflect the real situation
     chargeProfiles = calcChargeProfiles(plugProfiles, scalars)
 
     chargeMaxProfiles = calcChargeMaxProfiles(chargeProfiles,
@@ -56,12 +53,8 @@ if __name__ == '__main__':
                                               scalarsProc,
                                               nIter=20)
 
-    # Review (resolved) randNoPerProfile is not telling a lot about what the variable contains. It implies for me,
-    # that there are random numbers stored into this variable. Can this variable named more precisely
     randNoPerProfile = createRandNo(driveProfiles)
 
-    # Review naming variables after data types is unusual in Python as it is not a strongly typed language.
-    # Can this be named more precisely in the context of the domain?
     profileSelectors = calcProfileSelectors(chargeProfiles,
                                             consumptionProfiles,
                                             driveProfiles,
@@ -123,5 +116,5 @@ if __name__ == '__main__':
     #                         strAdd='_MR1_alpha1_batCap40_cons15')
 
     linePlot(profileDictOut, linkOutput=linkDict['linkPlots'],
-             show=True, write=True, stradd='MR1_alpha1_batCap40_cons15')
+             show=True, write=True, filename='MR1_alpha1_batCap40_cons15')
 

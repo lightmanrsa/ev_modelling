@@ -7,9 +7,10 @@ __birthdate__ = '24.02.2020'
 __status__ = 'test'  # options are: dev, test, prod
 
 # This script holds the function definitions for calculating the five profiles for describing
-# electric vehicle consumptions in VencoPy.
+# electric vehicle consumptions and respective charging flexibilities in VencoPy.
 
 import numpy as np
+import pandas as pd
 from random import seed
 from random import random
 from .libLogging import logit
@@ -29,10 +30,6 @@ def calcConsumptionProfiles(driveProfiles, scalars):
     """
 
     consumptionProfiles = driveProfiles.copy()
-    # review have you considered the pandas .astype() method? It is more performant than a direct float type cast.
-    # review the division by int 100 can be changed to float 100. which would force python above 2.7 to use float
-    # division and thus a typecast might not even be necessary
-    # consumptionProfiles = consumptionProfiles * float(scalars.loc['Electric consumption NEFZ', 'value']) / 100
     consumptionProfiles = consumptionProfiles * scalars.loc['Electric consumption NEFZ', 'value'] / float(100)
     return consumptionProfiles
 
@@ -49,8 +46,7 @@ def calcChargeProfiles(plugProfiles, scalars):
     '''
 
     chargeProfiles = plugProfiles.copy()
-    # review have you considered the pandas .astype() method? It is more performant than a direct float type cast.
-    chargeProfiles = chargeProfiles * float(scalars.loc['Rated power of charging column', 'value'])
+    chargeProfiles = chargeProfiles * scalars.loc['Rated power of charging column', 'value'].astype(float)
     return chargeProfiles
 
 
@@ -78,35 +74,26 @@ def calcChargeMaxProfiles(chargeProfiles, consumptionProfiles, scalars, scalarsP
     batCapMin = scalars.loc['Battery capacity', 'value'] * scalars.loc['Minimum SOC', 'value']
     batCapMax = scalars.loc['Battery capacity', 'value'] * scalars.loc['Maximum SOC', 'value']
     nHours = scalarsProc['noHours']
-    idxIt = 1
     for idxIt in range(nIter):
-        # ToDo: np.where() replace by pd.something(),
-        # ToDo: prohibit typecasting str(idx) in data preparation step colnames as integers {smell} in function indexProfiles()
-        for idx in range(nHours):
-            # testing line
-            # chargeMaxProfiles.ix[3, '0'] = 15.0
-            if idx == 0:
-                chargeMaxProfiles[str(idx)] = np.where(chargeMaxProfiles[str(idx)] <= batCapMax,
-                                                      chargeMaxProfiles[str(nHours - 1)],
-                                                      batCapMax)
+        for iHour in range(nHours):
+            if iHour == 0:
+                chargeMaxProfiles[iHour] = chargeMaxProfiles[nHours - 1].where(chargeMaxProfiles[iHour] <= batCapMax,
+                                                                               batCapMax)
+
             else:
                 # Calculate and append column with new SoC Max value for comparison and cleaner code
-                chargeMaxProfiles['newCharge'] = chargeMaxProfiles[str(idx - 1)] + \
-                                                chargeProfiles[str(idx)] - \
-                                                consumptionProfiles[str(idx)]
+                chargeMaxProfiles['newCharge'] = chargeMaxProfiles[iHour - 1] + \
+                                                chargeProfiles[iHour] - \
+                                                consumptionProfiles[iHour]
 
                 # Ensure that chargeMaxProfiles values are between batCapMin and batCapMax
-                chargeMaxProfiles[str(idx)] = np.where(chargeMaxProfiles['newCharge'] <= batCapMax,
-                                                      chargeMaxProfiles['newCharge'],
-                                                      batCapMax)
-                chargeMaxProfiles[str(idx)] = np.where(chargeMaxProfiles[str(idx)] >= batCapMin,
-                                                      chargeMaxProfiles[str(idx)],
-                                                      batCapMin)
+                chargeMaxProfiles[iHour] \
+                    = chargeMaxProfiles['newCharge'].where(chargeMaxProfiles['newCharge'] <= batCapMax, other=batCapMax)
+                chargeMaxProfiles[iHour] \
+                    = chargeMaxProfiles[iHour].where(chargeMaxProfiles[iHour] >= batCapMin, other=batCapMin)
 
-        # review: general remark instead of str(0) which is a performance heavy operation, one could write "0" which is equivalent and less performance heavy (performance impact is however negligible I guess)
-        devCrit = chargeMaxProfiles[str(nHours - 1)].sum() - chargeMaxProfiles[str(0)].sum()
+        devCrit = chargeMaxProfiles[nHours - 1].sum() - chargeMaxProfiles[0].sum()
         print(devCrit)
-        idxIt += 1
     chargeMaxProfiles.drop(labels='newCharge', axis='columns', inplace=True)
     return chargeMaxProfiles
 
@@ -127,18 +114,15 @@ def calcChargeProfilesUncontrolled(chargeMaxProfiles, scalarsProc):
     chargeProfilesUncontrolled = chargeMaxProfiles.copy()
     nHours = scalarsProc['noHours']
 
-    for idx in range(nHours):
-
-        if idx != 0:
-            chargeProfilesUncontrolled[str(idx)] = np.where(
-                chargeMaxProfiles[str(idx)] >= chargeMaxProfiles[str(idx - 1)],
-                chargeMaxProfiles[str(idx)] - chargeMaxProfiles[str(idx - 1)],
-                0)
+    for iHour in range(nHours):
+        if iHour != 0:
+            chargeProfilesUncontrolled[iHour] = chargeMaxProfiles[iHour] - chargeMaxProfiles[iHour - 1].where(
+                chargeMaxProfiles[iHour] >= chargeMaxProfiles[iHour - 1], other=0)
 
     # set value of uncontrolled charging for first hour to average between hour 1 and hour 23
     # because in calcChargeMax iteration the difference is minimized.
-    chargeProfilesUncontrolled[str(0)] = \
-        (chargeProfilesUncontrolled[str(1)] + chargeProfilesUncontrolled[str(nHours - 1)]) / 2
+    chargeProfilesUncontrolled[0] = \
+        (chargeProfilesUncontrolled[1] + chargeProfilesUncontrolled[nHours - 1]) / 2
     return chargeProfilesUncontrolled
 
 
@@ -170,15 +154,15 @@ def calcDriveProfilesFuelAux(chargeMaxProfiles, chargeProfilesUncontrolled, driv
 
     # review (resolved): have you considered naming idx into ihour as it actually contains the currently processed hour and would make the code more readable
     for iHour in range(nHours):
-        # review as far as I can tell, the hour 0 is never filled or added as a column to driveProfilesFuelAux. But this should raise an error in line 336 for idx 1. Why does this work anyhow?
+        # review as far as I can tell, the hour 0 is never filled or added as a column to driveProfilesFuelAux. But this should raise an error in line 336 for iHour 1. Why does this work anyhow?
         if iHour != 0:
-            driveProfilesFuelAux[str(iHour)] = (consumptionFuel / consumptionPower) * \
-                                             (driveProfiles[str(iHour)] * consumptionPower / 100 -
-                                              chargeProfilesUncontrolled[str(iHour)] -
-                                              (chargeMaxProfiles[str(iHour - 1)] - chargeMaxProfiles[str(iHour)]))
+            driveProfilesFuelAux[iHour] = (consumptionFuel / consumptionPower) * \
+                                             (driveProfiles[iHour] * consumptionPower / 100 -
+                                              chargeProfilesUncontrolled[iHour] -
+                                              (chargeMaxProfiles[iHour - 1] - chargeMaxProfiles[iHour]))
 
     # Setting value of hour=0 equal to the average of hour=1 and last hour
-    driveProfilesFuelAux[str(0)] = (driveProfilesFuelAux[str(nHours - 1)] + driveProfilesFuelAux[str(1)]) / 2
+    driveProfilesFuelAux[0] = (driveProfilesFuelAux[nHours - 1] + driveProfilesFuelAux[1]) / 2
     driveProfilesFuelAux = driveProfilesFuelAux.round(4)
     return driveProfilesFuelAux
 
@@ -214,37 +198,26 @@ def calcChargeMinProfiles(chargeProfiles, consumptionProfiles, driveProfilesFuel
     consElectric = scalars.loc['Electric consumption NEFZ', 'value']
     consGasoline = scalars.loc['Fuel consumption NEFZ', 'value']
     nHours = scalarsProc['noHours']
-    idxIt = 1
-    while idxIt <= nIter:
-        for idx in range(nHours):
-
-            # review (resolved) the above nHours implies, that the number of hours can vary based on user input or the
-            # underlying data. It seems to me risky to hardcode 23 here if the last hour is meant.
-            # Would it not be more prudent to use a variable lastHour that is nHours-1?
-            if idx == nHours-1:
-                chargeMinProfiles[str(idx)] = np.where(batCapMin <= chargeMinProfiles[str(idx)],
-                                                       chargeMinProfiles[str(0)],
-                                                       batCapMin)
+    for idxIt in range(nIter):
+        for iHour in range(nHours):
+            if iHour == nHours-1:
+                chargeMinProfiles[iHour] = chargeMinProfiles[0].where(batCapMin <= chargeMinProfiles[iHour],
+                                                                      other=batCapMin)
             else:
                 # Calculate and append column with new SOC Max value for comparison and nicer code
-                chargeMinProfiles['newCharge'] = chargeMinProfiles[str(idx + 1)] + \
-                                                 consumptionProfiles[str(idx + 1)] - \
-                                                 chargeProfiles[str(idx + 1)] - \
-                                                 (driveProfilesFuelAux[str(idx + 1)] * consElectric / consGasoline)
+                chargeMinProfiles['newCharge'] = chargeMinProfiles[iHour + 1] + \
+                                                 consumptionProfiles[iHour + 1] - \
+                                                 chargeProfiles[iHour + 1] - \
+                                                 (driveProfilesFuelAux[iHour + 1] * consElectric / consGasoline)
 
                 # Ensure that chargeMinProfiles values are between batCapMin and batCapMax
-                chargeMinProfiles[str(idx)] = np.where(chargeMinProfiles['newCharge'] >= batCapMin,
-                                                       chargeMinProfiles['newCharge'],
-                                                       batCapMin)
-                chargeMinProfiles[str(idx)] = np.where(chargeMinProfiles[str(idx)] <= batCapMax,
-                                                       chargeMinProfiles[str(idx)],
-                                                       batCapMax)
+                chargeMinProfiles[iHour] \
+                    = chargeMinProfiles['newCharge'].where(chargeMinProfiles['newCharge'] >= batCapMin, other=batCapMin)
+                chargeMinProfiles[iHour] \
+                    = chargeMinProfiles[iHour].where(chargeMinProfiles[iHour] <= batCapMax, other=batCapMax)
 
-        # FixMe Are these 2 lines of further use?
-        devCrit = chargeMinProfiles[str(nHours - 1)].sum() - chargeMinProfiles[str(0)].sum()
+        devCrit = chargeMinProfiles[nHours - 1].sum() - chargeMinProfiles[0].sum()
         print(devCrit)
-
-        idxIt += 1
     chargeMinProfiles.drop('newCharge', axis='columns', inplace=True)
     return chargeMinProfiles
 
@@ -346,12 +319,12 @@ def calcElectricPowerProfiles(consumptionProfiles, driveProfilesFuelAux, scalars
     nHours = scalarsProc['noHours']
     electricPowerProfiles = consumptionProfiles.copy()
     for iHour in range(nHours):
-        electricPowerProfiles[str(iHour)] = (consumptionProfiles[str(iHour)] - driveProfilesFuelAux[str(iHour)] *
+        electricPowerProfiles[iHour] = (consumptionProfiles[iHour] - driveProfilesFuelAux[iHour] *
                                            (consumptionPower / consumptionFuel))
         if filterIndex == 'indexCons':
-            electricPowerProfiles[str(iHour)] = electricPowerProfiles[str(iHour)] * indexCons
+            electricPowerProfiles[iHour] = electricPowerProfiles[iHour] * indexCons
         elif filterIndex == 'indexDSM':
-            electricPowerProfiles[str(iHour)] = electricPowerProfiles[str(iHour)] * indexDSM
+            electricPowerProfiles[iHour] = electricPowerProfiles[iHour] * indexDSM
     return electricPowerProfiles
 
 

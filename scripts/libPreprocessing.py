@@ -27,6 +27,9 @@ def indexProfile(driveProfiles_raw, plugProfiles_raw, indices):
 
     driveProfiles = driveProfiles_raw.set_index(list(indices))
     plugProfiles = plugProfiles_raw.set_index(list(indices))
+    # Typecast column indices to int for later looping over a range
+    driveProfiles.columns = driveProfiles.columns.astype(int)
+    plugProfiles.columns = plugProfiles.columns.astype(int)
     return driveProfiles, plugProfiles
 
 @logit

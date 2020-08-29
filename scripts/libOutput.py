@@ -14,6 +14,7 @@ import yaml
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pathlib
 from .libLogging import logit
 from .libLogging import logger
 
@@ -69,7 +70,7 @@ def cloneAndWriteProfile(profile, outputConfig, outputLink, noOfHoursOutput, tec
     for i in outputConfig['NonNullNodes']:
         profilesOut.loc[:, i] = np.round(profileCloned, 3)
 
-    profilesOut.to_csv(outputLink + '/' + filename + '.csv', index=False)
+    profilesOut.to_csv(outputLink / pathlib.Path(filename + '.csv'), index=False)
 
 
 @logit
@@ -128,10 +129,10 @@ def writeProfilesToCSV(outputFolder, profileDictOut, singleFile=True, strAdd='')
 
     if singleFile:
         dataOut = pd.DataFrame(profileDictOut)
-        dataOut.to_csv(outputFolder + 'vencoOutput' + strAdd + '.csv', header=True)
+        dataOut.to_csv(outputFolder / pathlib.Path(r'vencoOutput' + strAdd + '.csv'), header=True)
     else:
         for iName, iProf in profileDictOut.items():
-            iProf.to_csv(outputFolder + 'vencoOutput_' + iName + strAdd + '.csv', header=True)
+            iProf.to_csv(outputFolder / pathlib.Path(r'vencoOutput_' + iName + strAdd + '.csv'), header=True)
 
 
 @logit
@@ -154,9 +155,9 @@ def appendREMixProfiles(pre, names, post, linkFiles, linkOutput, outputPre, outp
     for key, strList in strDict.items():
         dfList = []
         for strIdx in strList:
-            df = pd.read_csv(linkFiles + '/' + strIdx)
+            df = pd.read_csv(linkFiles / strIdx)
             df.ix[df.iloc[:, 0] == 'BEV', 0] = strIdx[0:5]
-            df.rename(columns={'Unnamed: 1':' '}, inplace=True)
+            df.rename(columns={'Unnamed: 1': ' '}, inplace=True)
             dfList.append(df)
         dataDict[key] = dfList
 
@@ -164,7 +165,7 @@ def appendREMixProfiles(pre, names, post, linkFiles, linkOutput, outputPre, outp
     for key, value in dataDict.items():
         resultDict[key] = pd.concat(value)
         resultDict[key].to_csv(index=False,
-                               path_or_buf=linkOutput + outputPre + key + outputPost + '.csv',
+                               path_or_buf=linkOutput / pathlib.Path(outputPre + key + outputPost + '.csv'),
                                float_format='%.3f')
 
 
@@ -181,13 +182,15 @@ def composeStringDict(pre, names, post):
 
 
 @logit
-def linePlot(profileDict, linkOutput, show=True, write=True, stradd=''):
+def linePlot(profileDict, linkOutput, show=True, write=True, filename=''):
     fig, ax = plt.subplots()
     for iKey, iVal in profileDict.items():
         sns.lineplot(iVal.index, iVal, label=iKey, sort=False)
     ax.set_xlabel('Hour')
     ax.set_ylabel('Normalized profiles')
     ax.legend(loc='upper center', ncol=2, bbox_to_anchor=(0.5, 1.1))
-    fn = os.path.join(linkOutput, stradd + '.png')
-    if show: plt.show()
-    if write: fig.savefig(fn)
+    filePlot = linkOutput / pathlib.Path(filename + '.png')
+    if show:
+        plt.show()
+    if write:
+        fig.savefig(filePlot)

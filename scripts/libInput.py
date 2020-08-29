@@ -13,25 +13,27 @@ import pandas as pd
 from .libLogging import logit
 from .libLogging import logger
 from enum import Enum, auto
+import pathlib
 
 @logit
-def initializeLinkMgr(vencoConfig):
+def initializeLinkMgr(config):
     """
     Setup link manager based on a VencoPy config file.
 
-    :param vencoConfig: Config file initiated by a yaml-loader
+    :param config: Config file initiated by a yaml-loader
 
     :return: Returns link dictionary with relative links to input data and output folders.
     """
-    linkDict = {'linkScalars': vencoConfig['linksRelative']['input'] + vencoConfig['files']['inputDataScalars'],
-                    'linkDriveProfiles': vencoConfig['linksRelative']['input'] + vencoConfig['files'][
-                        "inputDataDriveProfiles"],
-                    'linkPlugProfiles': vencoConfig['linksRelative']['input'] + vencoConfig['files'][
-                        "inputDataPlugProfiles"],
-                    'linkOutputConfig': vencoConfig['linksRelative']['outputConfig'],
-                    'linkOutputAnnual': vencoConfig['linksRelative']['resultsAnnual'],
-                    'linkPlots': vencoConfig['linksRelative']['plots'],
-                    'linkOutput': vencoConfig['linksRelative']['resultsDaily']}
+    linkDict = {'linkScalars': pathlib.Path(config['linksRelative']['input']) /
+                               pathlib.Path(config['files']['inputDataScalars']),
+                'linkDriveProfiles': pathlib.Path(config['linksRelative']['input']) /
+                                     pathlib.Path(config['files']['inputDataDriveProfiles']),
+                'linkPlugProfiles': pathlib.Path(config['linksRelative']['input']) /
+                                    pathlib.Path(config['files']['inputDataPlugProfiles']),
+                'linkOutputConfig': pathlib.Path(config['linksRelative']['outputConfig']),
+                'linkOutputAnnual': pathlib.Path(config['linksRelative']['resultsAnnual']),
+                'linkPlots': pathlib.Path(config['linksRelative']['plots']),
+                'linkOutput': pathlib.Path(config['linksRelative']['resultsDaily'])}
     return linkDict
 
 
@@ -61,7 +63,7 @@ def readInputScalar(filePath):
     scalarInput = Assumptions
     inputRaw = pd.read_excel(filePath,
                               header=5,
-                              usecols="A:C",
+                              usecols='A:C',
                               skiprows=0)
     scalarsOut = inputRaw.set_index('parameter')
     return scalarsOut
@@ -119,7 +121,7 @@ def readVencoInput(config):
     tsConfig. Absolute links should contain the path to the output folder. Files should contain a link to scalar input
     data, and the two timeseries files inputDataDriveProfiles and inputDataPlugProfiles.
 
-    :param config: A yaml config file holding a dictionary with the keys "linksRelative" and "linksAbsolute"
+    :param config: A yaml config file holding a dictionary with the keys 'linksRelative' and 'linksAbsolute'
     :return: Returns four dataframes: A link dictionary, scalars, drive profile data and plug profile
     data, the latter three ones in a raw data format.
     """

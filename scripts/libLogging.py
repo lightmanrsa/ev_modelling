@@ -14,15 +14,14 @@ import logging.handlers
 
 logger = logging.getLogger('debugger')
 logger.setLevel(logging.INFO)
-h = logging.handlers.RotatingFileHandler('./debug.log')
-logger.addHandler(h)
-h = logging.StreamHandler()
-logger.addHandler(h)
+fileHandler = logging.handlers.RotatingFileHandler('./debug.log')
+logger.addHandler(fileHandler)
+streamHandler = logging.StreamHandler()
+logger.addHandler(streamHandler)
 
 
 
 def logit(f):
-
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         logger.debug(f'entering function "{f.__name__}"')
@@ -34,12 +33,10 @@ def logit(f):
         except Exception as E:
             logger.exception(f'Error during call of function "{f.__name__}"')
             raise E
-
         end = time.time()
         logger.debug(f'function call took {end-start} ms')
         logger.debug(f'exiting function "{f.__name__}"')
         return ret  # added this line myself since variable ret wasn't used before
-
     return wrapper
 
 
