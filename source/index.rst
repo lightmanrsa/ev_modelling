@@ -24,6 +24,8 @@ Indices and tables
     installation
     start
     functions
+    filtering
+    outputProfileSpecification
 
 
 Documentation
@@ -32,4 +34,6 @@ Documentation
 * :ref:`installation`.
 * :ref:`start`.
 * :ref:`functions`.
+* :ref:`filtering`.
+* :ref:`outputProfileSpecification`.
 
