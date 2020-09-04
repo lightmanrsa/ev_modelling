@@ -116,7 +116,7 @@ def calcChargeProfilesUncontrolled(chargeMaxProfiles, scalarsProc):
 
     for iHour in range(nHours):
         if iHour != 0:
-            chargeProfilesUncontrolled[iHour] = chargeMaxProfiles[iHour] - chargeMaxProfiles[iHour - 1].where(
+            chargeProfilesUncontrolled[iHour] = (chargeMaxProfiles[iHour] - chargeMaxProfiles[iHour - 1]).where(
                 chargeMaxProfiles[iHour] >= chargeMaxProfiles[iHour - 1], other=0)
 
     # set value of uncontrolled charging for first hour to average between hour 1 and hour 23

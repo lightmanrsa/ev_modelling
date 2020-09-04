@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ecd0004f-94bb-43f5-9ca2-d220fe3ef765" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/scripts/libInput.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/libInput.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/libLogging.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/libLogging.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/libOutput.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/libOutput.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/libPreprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/libPreprocessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/libProfileCalculation.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/libProfileCalculation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/venco_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/venco_main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,11 +13,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/venco_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="432">
-              <caret line="42" column="40" selection-start-line="42" selection-start-column="40" selection-end-line="42" selection-end-column="40" />
+            <state relative-caret-position="-97">
+              <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
               <folding>
                 <element signature="e#232#262#0" expanded="true" />
               </folding>
@@ -56,24 +52,28 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/scripts/libProfileCalculation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="369">
+            <state relative-caret-position="-546">
               <caret line="120" lean-forward="true" selection-start-line="120" selection-end-line="120" />
               <folding>
                 <element signature="e#205#298#0" />
-                <element signature="e#382#400#0" expanded="true" />
                 <element signature="e#540#1572#0" />
                 <element signature="e#540#977#1" />
                 <element signature="e#1633#2197#0" />
                 <element signature="e#1633#2022#1" />
-                <element signature="e#5956#6557#1" />
+                <element signature="e#5062#7856#0" />
+                <element signature="e#5039#6119#1" />
+                <element signature="e#6551#7750#0" />
+                <element signature="e#6645#7624#0" />
+                <element signature="e#6656#6848#0" />
+                <element signature="e#6912#7803#0" />
                 <element signature="e#7462#10116#0" />
                 <element signature="e#7563#8530#1" />
                 <element signature="e#8536#8670#0" />
-                <element signature="e#8833#9404#0" />
-                <element signature="e#9055#9404#0" />
+                <element signature="e#10279#11569#1" />
+                <element signature="e#11575#11672#0" />
                 <element signature="e#14406#15156#0" />
                 <element signature="e#14406#14820#1" />
                 <element signature="e#15490#18410#0" />
@@ -290,10 +290,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1944" />
-    <option name="y" value="390" />
+    <option name="x" value="1912" />
+    <option name="y" value="-8" />
     <option name="width" value="1936" />
-    <option name="height" value="1096" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -316,7 +316,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../emobpy_codebase" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Documents/01 Modellentwicklung/VencoPy/preReleaseVersions/VencoPy_0.0.8" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RunDashboard">
@@ -406,7 +406,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32914925" />
       <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.37346712" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.36231884" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.59643257" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32936078" />
@@ -478,6 +478,18 @@
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
       <expression>
+        <expression-string>(chargeMaxProfiles[10] - chargeMaxProfiles[10 - 1]).where(
+                chargeMaxProfiles[10] &gt;= chargeMaxProfiles[10 - 1], other=0)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>chargeMaxProfiles[10] - chargeMaxProfiles[10 - 1].where(
+                chargeMaxProfiles[10] &gt;= chargeMaxProfiles[10 - 1], other=0)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
         <expression-string>chargeMaxProfiles['newCharge'].where(chargeMaxProfiles['newCharge'] &gt; batCapMax, batCapMax)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
@@ -511,19 +523,6 @@
       </expression>
       <expression>
         <expression-string>chargeMaxProfiles</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>randNoPerProfile</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>pd.read_excel(filePath,
-                              header=5,
-                              usecols='A:C',
-                              skiprows=0)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -755,33 +754,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/venco_main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="42" column="40" selection-start-line="42" selection-start-column="40" selection-end-line="42" selection-end-column="40" />
-          <folding>
-            <element signature="e#232#262#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/scripts/libProfileCalculation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="369">
+        <state relative-caret-position="-546">
           <caret line="120" lean-forward="true" selection-start-line="120" selection-end-line="120" />
           <folding>
             <element signature="e#205#298#0" />
-            <element signature="e#382#400#0" expanded="true" />
             <element signature="e#540#1572#0" />
             <element signature="e#540#977#1" />
             <element signature="e#1633#2197#0" />
             <element signature="e#1633#2022#1" />
-            <element signature="e#5956#6557#1" />
+            <element signature="e#5062#7856#0" />
+            <element signature="e#5039#6119#1" />
+            <element signature="e#6551#7750#0" />
+            <element signature="e#6645#7624#0" />
+            <element signature="e#6656#6848#0" />
+            <element signature="e#6912#7803#0" />
             <element signature="e#7462#10116#0" />
             <element signature="e#7563#8530#1" />
             <element signature="e#8536#8670#0" />
-            <element signature="e#8833#9404#0" />
-            <element signature="e#9055#9404#0" />
+            <element signature="e#10279#11569#1" />
+            <element signature="e#11575#11672#0" />
             <element signature="e#14406#15156#0" />
             <element signature="e#14406#14820#1" />
             <element signature="e#15490#18410#0" />
@@ -822,6 +815,16 @@
             <element signature="e#28743#28958#0" />
             <element signature="e#28978#29192#0" />
             <element signature="e#29198#29223#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venco_main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-97">
+          <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
+          <folding>
+            <element signature="e#232#262#0" expanded="true" />
           </folding>
         </state>
       </provider>
