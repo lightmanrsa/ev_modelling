@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
 
-__version__ = '0.1.0'
+__version__ = '0.0.8'
 __maintainer__ = 'Niklas Wulff 24.02.2020'
 __email__ = 'Niklas.Wulff@dlr.de'
-__birthdate__ = '24.02.2019'
+__birthdate__ = '04.09.2019'
 __status__ = 'test'  # options are: dev, test, prod
 
 # This script holds the function definitions for output writing and plotting of calaculated profiles from VencoPy.

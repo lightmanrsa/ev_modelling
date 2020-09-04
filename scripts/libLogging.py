@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 
-__version__ = '0.1.0'
+__version__ = '0.0.8'
 __maintainer__ = 'Benjamin Fuchs 12.11.2019'
 __email__ = 'Benjamin.Fuchs@dlr.de'
 __birthdate__ = '26.07.2019'

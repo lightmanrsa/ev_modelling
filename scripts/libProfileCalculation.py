@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
-__version__ = '0.0.7'
-__maintainer__ = 'Niklas Wulff 16.04.2020'
+__version__ = '0.0.8'
+__maintainer__ = 'Niklas Wulff 04.09.2020'
 __email__ = 'Niklas.Wulff@dlr.de'
 __birthdate__ = '24.02.2020'
 __status__ = 'test'  # options are: dev, test, prod
@@ -152,9 +152,7 @@ def calcDriveProfilesFuelAux(chargeMaxProfiles, chargeProfilesUncontrolled, driv
     driveProfilesFuelAux = chargeMaxProfiles.copy()
     nHours = scalarsProc['noHours']
 
-    # review (resolved): have you considered naming idx into ihour as it actually contains the currently processed hour and would make the code more readable
     for iHour in range(nHours):
-        # review as far as I can tell, the hour 0 is never filled or added as a column to driveProfilesFuelAux. But this should raise an error in line 336 for iHour 1. Why does this work anyhow?
         if iHour != 0:
             driveProfilesFuelAux[iHour] = (consumptionFuel / consumptionPower) * \
                                              (driveProfiles[iHour] * consumptionPower / 100 -
@@ -252,9 +250,10 @@ def calcProfileSelectors(chargeProfiles,
                          isBEV):
     """
     This function calculates two filters. The first filter, filterCons, excludes profiles that depend on auxiliary
-    fuel with an option of a tolerance and those that don't reach a minimum daily average for mileage.
-    A second filter filterDSM excludes profiles where the battery doesn't suffice the mileage and those where charging
-    throughout the day supplies less energy than necessary for the respective trips.
+    fuel with an option of a tolerance (bolFuelDriveTolerance) and those that don't reach a minimum daily average for
+    mileage (bolMinDailyMileage).
+    A second filter filterDSM excludes profiles where charging throughout the day supplies less energy than necessary
+    for the respective trips (bolConsumption) and those where the battery doesn't suffice the mileage (bolSuffBat).
 
     :param chargeProfiles: Indexed DataFrame giving hourly charging profiles
     :param consumptionProfiles: Indexed DataFrame giving hourly consumption profiles
@@ -360,20 +359,18 @@ def setUnconsideredBatProfiles(chargeMaxProfiles, chargeMinProfiles, filterCons,
 
 
 @logit
-def indexFilter(chargeMaxProfiles, chargeMinProfiles, filterCons):
+def filterConsProfiles(profile, filterCons, critCol):
     """
-    Filters out profiles where indexCons is False.
+    Filter out all profiles from given profile types whose boolean indices (so far DSM or cons) are FALSE.
 
-    :param profiles: Profile keys in DataManager given as list of strings.
-    :return: Writes filtered profiles to DataManager under the key 'profilesCons' in a dictionary with keys given
-    by parameter profiles.
+    :param profile: Dataframe of hourly values for all filtered profiles
+    :param filterCons: Identifiers given as list of string to store filtered profiles back into the DataManager
+    :param critCol: Criterium column for filtering
+    :return: Stores filtered profiles in the DataManager under keys given in dmgrNames
     """
 
-    profilesFilterConsMin = chargeMinProfiles.loc[filterCons['indexCons'], :]
-    profilesFilterConsMax = chargeMaxProfiles.loc[filterCons['indexCons'], :]
-    profilesFilterDSMMin = chargeMinProfiles.loc[filterCons['indexDSM'], :]
-    profilesFilterDSMMax = chargeMinProfiles.loc[filterCons['indexDSM'], :]
-    return profilesFilterConsMin, profilesFilterConsMax, profilesFilterDSMMin, profilesFilterDSMMax
+    outputProfile = profile.loc[filterCons[critCol], :]
+    return outputProfile
 
 
 @logit
@@ -429,43 +426,11 @@ def normalizeProfiles(scalars, socMin, socMax, normReferenceParam):
         socMinNorm = socMin.div(float(normReference))
         socMaxNorm = socMax.div(float(normReference))
 
-    except ValueError:
-        # review general if " is used instead of ' the escaping of \' is not necessary
+    except ValueError as E:
         # review general so is this not a problem at all if this happens?
         # s I understand this code, socMin and socMax would be unchanged by this function call
-        print('There was a value error. I don\'t know what to tell you.')
+        raise(f"There was a value error. {E} I don't know what to tell you.")
     return socMinNorm, socMaxNorm
-
-
-@logit
-def filterConsProfiles(profile, filterCons, critCol):
-    """
-    Filter out all profiles from given profile types whose boolean indices (so far DSM or cons) are FALSE.
-
-    :param profile: Dataframe of hourly values for all filtered profiles
-    :param filterCons: Identifiers given as list of string to store filtered profiles back into the DataManager
-    :param critCol: Criterium column for filtering
-    :return: Stores filtered profiles in the DataManager under keys given in dmgrNames
-    """
-
-    outputProfile = profile.loc[filterCons[critCol], :]
-    return outputProfile
-
-
-# FIXME so far not used. Plug profiles are aggregated in the action aggregateProfiles.
-@logit
-def considerProfiles(profiles, consider, colStart, colEnd, colCons):
-    profilesOut = profiles.copy()
-
-    try:
-            profilesOut = profiles[consider[colCons].astype('bool'), colStart: colEnd]
-    except KeyError:
-        # review general: these are silent fails. How should the user react? Can this create a data problem
-        # downstream? Is this invalidating your results or is this nothing to bother at all?
-        # It is not clear from the error message. Also key is a bit unclear in this context.
-        print("Key Error. "
-            "The key {} is not part of {}".format(colCons, consider))
-    return profilesOut
 
 
 @logit
@@ -478,14 +443,9 @@ def aggregateProfiles(profilesIn):
     """
 
     # Typecasting is necessary for aggregation of boolean profiles
-    profilesOut = profilesIn.iloc[0, :].astype('float64', copy=True)
+    # profilesOut = profilesIn.iloc[0, :].astype('float64', copy=True)
     lenProfiles = len(profilesIn)
-
-    # review have you considered using pandas dataframe .T to transpose,
-    # use sum to get the sum of each column and then divide by lenProfiles?
-    # This would be more concise in writing and more performant than a python loop
-    for colidx in profilesIn:
-        profilesOut[colidx] = sum(profilesIn.loc[:, colidx]) / lenProfiles
+    profilesOut = profilesIn.apply(sum, axis=0) / lenProfiles
     return profilesOut
 
 
@@ -502,25 +462,17 @@ def correctProfiles(scalars, profile, profType):
     :return:
     """
 
-    profileOut = profile.copy()
     if profType == 'electric':
         consumptionElectricNEFZ = scalars.loc['Electric consumption NEFZ', 'value']
         consumptionElectricArtemis = scalars.loc['Electric consumption Artemis', 'value']
         corrFactor = consumptionElectricArtemis / consumptionElectricNEFZ
-
     elif profType == 'fuel':
         consumptionFuelNEFZ = scalars.loc['Fuel consumption NEFZ', 'value']
         consumptionFuelArtemis = scalars.loc['Fuel consumption Artemis', 'value']
         corrFactor = consumptionFuelArtemis / consumptionFuelNEFZ
-
     else:
         # review I expect raising an exception here. Would it not be a problem if the processing continues silently?
         print('Either parameter "profType" is not given or not assigned to either "electric" or "fuel".')
-
-    # review same like above:
-    # review have you considered using pandas dataframe .T to transpose, use sum to get the sum of each column and
-    # then divide by lenProfiles? This would be more concise in writing and more performant than a python loop
-    for colIdx in profile.index:
-        profileOut[colIdx] = corrFactor * profile[colIdx]
+    profileOut = corrFactor * profile
     return profileOut
 

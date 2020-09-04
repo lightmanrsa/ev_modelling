@@ -64,43 +64,43 @@ if __name__ == '__main__':
                                             fuelDriveTolerance=0.001,
                                             isBEV=True)
 
+    # Additional fuel consumption is subtracted from the consumption
     electricPowerProfiles = calcElectricPowerProfiles(consumptionProfiles,
                                                       driveProfilesFuelAux,
                                                       scalars,
                                                       profileSelectors,
                                                       scalarsProc,
-                                                      filterIndex='indexCons')
+                                                      filterIndex='indexDSM')
 
-    chargeMaxProfilesDSM, chargeMinProfilesDSM = setUnconsideredBatProfiles(chargeMaxProfiles, chargeMinProfiles,
-                                                                            profileSelectors, minValue=0,
-                                                                            maxValue=9999)
-
-    profilesFilterConsMin, \
-    profilesFilterConsMax, \
-    profilesFilterDSMMin, \
-    profilesFilterDSMMax = indexFilter(chargeMaxProfiles,
-                                       chargeMinProfiles,
-                                       profileSelectors)
-
-    SOCMin, SOCMax = socProfileSelection(profilesFilterConsMin, profilesFilterConsMax,
-                                         filter='singleValue', alpha=1)
-
-    socMinNorm, socMaxNorm = normalizeProfiles(scalars, SOCMin, SOCMax,
-                                               normReferenceParam='Battery capacity')
-
+    # Profile filtering for flow profiles
     plugProfilesCons = filterConsProfiles(plugProfiles, profileSelectors, critCol='indexCons')
     electricPowerProfilesCons = filterConsProfiles(electricPowerProfiles, profileSelectors, critCol='indexCons')
-    chargeProfilesUncontrolledCons = filterConsProfiles(chargeProfilesUncontrolled, profileSelectors, critCol='indexCons')
+    chargeProfilesUncontrolledCons = filterConsProfiles(chargeProfilesUncontrolled, profileSelectors,
+                                                        critCol='indexCons')
     driveProfilesFuelAuxCons = filterConsProfiles(driveProfilesFuelAux, profileSelectors, critCol='indexCons')
 
+    # Profile filtering for state profiles
+    profilesSOCMinCons = filterConsProfiles(chargeMinProfiles, profileSelectors, critCol='indexDSM')
+    profilesSOCMaxCons = filterConsProfiles(chargeMaxProfiles, profileSelectors, critCol='indexDSM')
+
+    # Profile aggregation for flow profiles by averaging
     plugProfilesAgg = aggregateProfiles(plugProfilesCons)
     electricPowerProfilesAgg = aggregateProfiles(electricPowerProfilesCons)
     chargeProfilesUncontrolledAgg = aggregateProfiles(chargeProfilesUncontrolledCons)
     driveProfilesFuelAuxAgg = aggregateProfiles(driveProfilesFuelAuxCons)
 
+    # Profile aggregation for state profiles by selecting one profiles value for each hour
+    SOCMin, SOCMax = socProfileSelection(profilesSOCMinCons, profilesSOCMaxCons,
+                                         filter='singleValue', alpha=1)
+
+    # Profile correction for flow profiles
     chargeProfilesUncontrolledCorr = correctProfiles(scalars, chargeProfilesUncontrolledAgg, 'electric')
     electricPowerProfilesCorr = correctProfiles(scalars, electricPowerProfilesAgg, 'electric')
     driveProfilesFuelAuxCorr = correctProfiles(scalars, driveProfilesFuelAuxAgg, 'fuel')
+
+    # Profile normalization for state profiles with the basis battery capacity
+    socMinNorm, socMaxNorm = normalizeProfiles(scalars, SOCMin, SOCMax,
+                                               normReferenceParam='Battery capacity')
 
     profileDictOut = dict(uncontrolledCharging=chargeProfilesUncontrolledCorr,
                           electricityDemandDriving=electricPowerProfilesCorr, SOCMax=socMaxNorm, SOCMin=socMinNorm,
