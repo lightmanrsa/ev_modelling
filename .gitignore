@@ -9,11 +9,12 @@
 !/output/.gitkeep
 
 # old or irrelevant files and folders
+/administration
 /archive
 /scripts/lib.py
 /inputData/emobpyData
 /inputData/archive
-/presentation/archive
+/presentation
 /JupyterNotebooks
 
 # files still in process
@@ -22,6 +23,9 @@
 
 # log files
 debug.log
+Makefile
+demo_VencoPy.ipynb
+make.bat
 
 # documentation files on local machine
 /build
