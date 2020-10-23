@@ -10,9 +10,9 @@ How to contribute
 General information
 ---------------------
 
-VencoPy is a tool that's open for your contribution. If you're interested in contributing to the code, the documentation, have a dataset that may act as an input to VencoPy or want to share other contributions, you're greatfully invited to share them. For this, please read, sign and send the Contributors License Agreement (CLA) to Niklas Wulff.
+VencoPy is a tool that's open for your contribution. If you're interested in contributing to the code, the documentation, have a dataset that may act as an input to VencoPy or want to share other contributions, you're gratefully invited to share them. For this, please read, sign and send the Contributors License Agreement (CLA) to Niklas Wulff.
 
-When contributing to this repository, please discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change. We're happy to receive feedback and ammendments and to include them into the repository. 
+When contributing to this repository, please discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change. We're happy to receive feedback and amendments and to include them into the repository. 
 
 Please check our code style, before making any changes to the code. 
 
