@@ -22,7 +22,7 @@ formats:
 python:
   version: 3.7
   install:
-    - requirements: requirementsPreRelease.yml
+    - requirements: requirements.yml
 #    - method: pip
 #      path: .
 #      extra_requirements:
@@ -30,5 +30,5 @@ python:
 
 # Conda requirements installation
 conda:
-    environment: requirementsPreRelease.yml
+    environment: requirements.yml
         
