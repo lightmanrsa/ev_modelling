@@ -18,7 +18,7 @@ Indices and tables
 
 .. toctree::
     :maxdepth: 2
-    :caption: Contents:
+    :caption: Documentation:
     
     intro
     installation
@@ -29,17 +29,3 @@ Indices and tables
     filtering
     outputProfileSpecification
     howToContribute
-
-
-Documentation
--------------
-* :ref:`intro`.
-* :ref:`installation`.
-* :ref:`start`.
-* :ref:`codestyle`.
-* :ref:`architecture`.
-* :ref:`functions`.
-* :ref:`filtering`.
-* :ref:`outputProfileSpecification`.
-* :ref:`howToContribute`.
-

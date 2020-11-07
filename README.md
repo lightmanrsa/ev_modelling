@@ -25,6 +25,8 @@ python venco_main.py
 
 
 Documentation
-Build docu from a conda bash with activated environment typing
+A public documentation is hosted on readthedocs here: https://vencopy.readthedocs.io/en/latest/
+
+Alternatively, you can build a docu from a conda bash with an activated VencoPy environment typing
 
 sphinx-build -b html ./source/ ./build/
