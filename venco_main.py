@@ -11,7 +11,6 @@ from scripts.libInput import *
 from scripts.libPreprocessing import *
 from scripts.libProfileCalculation import *
 from scripts.libOutput import *
-from scripts.libPlotting import *
 from scripts.libLogging import logger
 import pathlib
 

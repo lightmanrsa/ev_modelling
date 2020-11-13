@@ -24,7 +24,7 @@ This part of the documentation holds a step-by-step installation guide for Venco
     enter the following command::
         
         conda env create -f requirements.yml
-        conda activate <VencoPy_preRelease>
+        conda activate vencopy_env
     
 3.  Configure your config files if you want to use absolute links. This is only needed if you want to reference your own
     local data or want to post-process VencoPy results and write them to a model input folder somewhere on your drive.

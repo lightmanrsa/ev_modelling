@@ -20,7 +20,7 @@ conda env create -f requirements.yml
 
 An environment named "VencoPy_preRelease" will be created. Activate by entering::
 
-conda activate VencoPy_preRelease 
+conda activate VencoPy_env
 
 In the same folder, run VencoPy by typing ::
 
