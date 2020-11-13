@@ -13,14 +13,15 @@ from scripts.libProfileCalculation import *
 from scripts.libOutput import *
 import pathlib
 
+
 #ToDo: Maybe consolidate selection actions to one aggregation and one filtering action
 
 if __name__ == '__main__':
     #----- data and config read-in -----
+    createOutputFolders()
     linkConfig = pathlib.Path.cwd() / 'config' / 'config.yaml'  # pathLib syntax for windows, max, linux compatibility, see https://realpython.com/python-pathlib/ for an intro
     config = yaml.load(open(linkConfig), Loader=yaml.SafeLoader)
     linkDict, scalars, driveProfilesRaw, plugProfilesRaw = readVencoInput(config)
-    outputConfig = yaml.load(open(linkDict['linkOutputConfig']), Loader=yaml.SafeLoader)
     indices = ['CASEID', 'PKWID']
     driveProfiles, plugProfiles = indexProfile(driveProfilesRaw, plugProfilesRaw, indices)
     scalarsProc = procScalars(driveProfilesRaw, plugProfilesRaw, driveProfiles, plugProfiles)

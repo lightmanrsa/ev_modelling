@@ -17,6 +17,13 @@ import seaborn as sns
 import pathlib
 
 
+def createOutputFolders():
+    if not os.path.exists('./output/plots'):
+        os.mkdir('./output/plots')
+    if not os.path.exists('./output/dailyTimeseries'):
+        os.mkdir('./output/dailyTimeseries')
+
+
 def writeAnnualOutputForREMix(profileDict, outputConfig, outputLink, noOfHoursOutput, technologyLabel, strAdd):
     """
     Output wrapper function to call cloneAndWriteProfile once for each output profile.
