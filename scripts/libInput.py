@@ -10,12 +10,9 @@ __status__ = 'test'  # options are: dev, test, prod
 
 import yaml
 import pandas as pd
-from .libLogging import logit
-from .libLogging import logger
 from enum import Enum, auto
 import pathlib
 
-@logit
 def initializeLinkMgr(config):
     """
     Setup link manager based on a VencoPy config file.
@@ -37,19 +34,6 @@ def initializeLinkMgr(config):
     return linkDict
 
 
-class Assumptions(Enum):
-    minDailyMileage = auto()
-    batteryCapacity = auto()
-    electricConsumption = auto()
-    fuelConsumption = auto()
-    electricConsumptionCorr = auto()
-    fuelConsumptionCorr = auto()
-    maximumSOC = auto()
-    minimumSOC = auto()
-    powerChargingStation = auto()
-    isBEV = auto()
-
-@logit
 def readInputScalar(filePath):
     """
     Method that gets the path to a venco scalar input file specifying technical assumptions such as battery capacity
@@ -60,7 +44,6 @@ def readInputScalar(filePath):
         second one holds units.
     """
 
-    scalarInput = Assumptions
     inputRaw = pd.read_excel(filePath,
                               header=5,
                               usecols='A:C',
@@ -69,7 +52,6 @@ def readInputScalar(filePath):
     return scalarsOut
 
 
-@logit
 def readInputCSV(filePath):
     """
     Reads input and cuts out value columns from a given CSV file.
@@ -82,7 +64,6 @@ def readInputCSV(filePath):
     return inputData
 
 
-@logit
 def stringToBoolean(df):
     """
     Replaces given strings with python values for true or false.
@@ -98,7 +79,6 @@ def stringToBoolean(df):
     return (outBool)
 
 
-@logit
 def readInputBoolean(filePath):
     """
     Wrapper function for reading boolean data from CSV.
@@ -112,7 +92,6 @@ def readInputBoolean(filePath):
     return inputData
 
 
-@logit
 def readVencoInput(config):
     """
     Initializing action for VencoPy-specific config-file, link dictionary and data read-in. The config file has
