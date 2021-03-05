@@ -2,8 +2,8 @@ __version__ = '0.0.8'
 __maintainer__ = 'Niklas Wulff'
 __email__ = 'Niklas.Wulff@dlr.de'
 __birthdate__ = '03.11.2019'
-__status__ = 'dev'  # options are: dev, test, prod
-__license__ = 'BSD-3-Clause'
+__status__ = 'test'  # options are: dev, test, prod
+__license__ = 'BSD-3-Clause'  # https://opensource.org/licenses/BSD-3-Clause
 
 
 #----- imports & packages ------
@@ -11,18 +11,17 @@ from scripts.libInput import *
 from scripts.libPreprocessing import *
 from scripts.libProfileCalculation import *
 from scripts.libOutput import *
-from scripts.libPlotting import *
-from scripts.libLogging import logger
 import pathlib
+
 
 #ToDo: Maybe consolidate selection actions to one aggregation and one filtering action
 
 if __name__ == '__main__':
     #----- data and config read-in -----
+    createOutputFolders()
     linkConfig = pathlib.Path.cwd() / 'config' / 'config.yaml'  # pathLib syntax for windows, max, linux compatibility, see https://realpython.com/python-pathlib/ for an intro
     config = yaml.load(open(linkConfig), Loader=yaml.SafeLoader)
     linkDict, scalars, driveProfilesRaw, plugProfilesRaw = readVencoInput(config)
-    outputConfig = yaml.load(open(linkDict['linkOutputConfig']), Loader=yaml.SafeLoader)
     indices = ['CASEID', 'PKWID']
     driveProfiles, plugProfiles = indexProfile(driveProfilesRaw, plugProfilesRaw, indices)
     scalarsProc = procScalars(driveProfilesRaw, plugProfilesRaw, driveProfiles, plugProfiles)

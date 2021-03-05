@@ -3,28 +3,34 @@
 - Contact: niklas.wulff@dlr.de
 - Version: 0.0.8 (pre-release)
 
-Description
+## Description
 A data process tool offering hourly demand and flexibility profiles for future electric vehicle fleets in an aggregated manner.
 
-Codestyle 
+## Codestyle 
 We use PEP-8, with the exception of lowerCamelCase for method and variable names as well as UpperCamelCase for classes
 
-Install instructions
-Install using the environment management system conda, open the conda console navigate to your VencoPy folder and run the following commands
+## Install instructions
+Clone VencoPy to a folder of your wish typing ::
 
-conda create -f requirementsPreRelease.yml
-[confirm]
+    git clone https://gitlab.com/dlr-ve/vencopy.git
 
-An environment named "VencoPy_preRelease" will be created. Activate by entering
+Install using the environment management system conda, open the conda console navigate to your VencoPy folder and run the following commands::
 
-conda activate VencoPy_preRelease 
+    conda env create -f requirements.yml
 
-In the same folder, run VencoPy by typing 
+An environment named "VencoPy_preRelease" will be created. Activate by entering::
 
-python venco_main.py
+    conda activate VencoPy_env
+
+In the same folder, run VencoPy by typing ::
+
+    python venco_main.py
 
 
-Documentation
-Build docu from a conda bash with activated environment typing
+## Documentation
 
-sphinx-build -b html ./source/ ./build/
+A public documentation is hosted on readthedocs here: https://vencopy.readthedocs.io/en/latest/
+
+Alternatively, you can build a docu from a conda bash with an activated VencoPy environment typing::
+
+    sphinx-build -b html ./source/ ./build/

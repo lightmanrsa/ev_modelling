@@ -15,11 +15,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pathlib
-from .libLogging import logit
-from .libLogging import logger
 
 
-@logit
+def createOutputFolders():
+    if not os.path.exists('./output/plots'):
+        os.mkdir('./output/plots')
+    if not os.path.exists('./output/dailyTimeseries'):
+        os.mkdir('./output/dailyTimeseries')
+
+
 def writeAnnualOutputForREMix(profileDict, outputConfig, outputLink, noOfHoursOutput, technologyLabel, strAdd):
     """
     Output wrapper function to call cloneAndWriteProfile once for each output profile.
@@ -37,7 +41,6 @@ def writeAnnualOutputForREMix(profileDict, outputConfig, outputLink, noOfHoursOu
         cloneAndWriteProfile(iProf, outputConfig, outputLink, noOfHoursOutput, technologyLabel, filename)
 
 
-@logit
 def cloneAndWriteProfile(profile, outputConfig, outputLink, noOfHoursOutput, technologyLabel, filename):
     """
     This action clones daily profiles to cover the specified time horizon given in noOfHoursOutput.
@@ -73,7 +76,6 @@ def cloneAndWriteProfile(profile, outputConfig, outputLink, noOfHoursOutput, tec
     profilesOut.to_csv(outputLink / pathlib.Path(filename + '.csv'), index=False)
 
 
-@logit
 def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
     """
     Creation method for building a specifically formatted dataframe for output processing of VencoPy profiles.
@@ -113,7 +115,6 @@ def createEmptyDataFrame(technologyLabel, numberOfHours, nodes):
     return df
 
 
-@logit
 def writeProfilesToCSV(outputFolder, profileDictOut, singleFile=True, strAdd=''):
     """
     Function to write VencoPy profiles to either one or five .csv files in the output folder specified in outputFolder.
@@ -135,7 +136,6 @@ def writeProfilesToCSV(outputFolder, profileDictOut, singleFile=True, strAdd='')
             iProf.to_csv(outputFolder / pathlib.Path(r'vencoOutput_' + iName + strAdd + '.csv'), header=True)
 
 
-@logit
 def appendREMixProfiles(pre, names, post, linkFiles, linkOutput, outputPre, outputPost):
     """
     REMix specific append functionality to integrate results of three different VencoPy-runs into one file per profile.
@@ -169,7 +169,6 @@ def appendREMixProfiles(pre, names, post, linkFiles, linkOutput, outputPre, outp
                                float_format='%.3f')
 
 
-@logit
 def composeStringDict(pre, names, post):
     dict = {}
     for nIdx in names:
@@ -181,7 +180,6 @@ def composeStringDict(pre, names, post):
     return dict
 
 
-@logit
 def linePlot(profileDict, linkOutput, show=True, write=True, filename=''):
     fig, ax = plt.subplots()
     for iKey, iVal in profileDict.items():

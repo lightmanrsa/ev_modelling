@@ -4,9 +4,9 @@
 # __maintainer__ = 'Niklas Wulff 2019-02-12'
 # __email__ = 'Niklas.Wulff@dlr.de'
 # __birthdate__ = '2019-02-12'
-# __status__ = 'dev'  # options are: dev, test, prod
+# __status__ = 'test'  # options are: dev, test, prod
 
-# This config holds all relative paths and filenames for VENCO
+# This config holds all relative paths and filenames for VencoPy
 
 linksRelative:
     input: ./inputData/
@@ -17,10 +17,8 @@ linksRelative:
     config: ./config/
     outputConfig: ./config/outputConfigREMix.yaml
 
-# During first configuration, optionally fill in absolute links on your system e.g. if you want to have post processed
-# output written to an energy system model input folder
 linksAbsolute:
-    someLinkOnHardDrive: C:/REMix-OaM/OptiMo/projects/wulf_ni/paperModelCouplingCURRENT_repairCheckout/data/sus_base/data/timeSeriesGlobal
+    someLinkOnHardDrive:
 
 files:
     inputDataScalars: VencoPy_scalarInput.xlsx
