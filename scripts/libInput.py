@@ -7,7 +7,6 @@ __birthdate__ = '24.02.2020'
 __status__ = 'test'  # options are: dev, test, prod
 
 # This file holds the function definitions for VencoPy input functions.
-# ITS SO OLD!
 
 import yaml
 import pandas as pd
