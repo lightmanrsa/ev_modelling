@@ -1,4 +1,5 @@
 [![License: BSD 3-Clause](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/TechSmith/hyde/blob/master/LICENSE.txt)
+[![Documentation Status](https://readthedocs.org/projects/vencopy/badge/?version=latest)](https://vencopy.readthedocs.io/en/latest/?badge=latest)
 
 
 
