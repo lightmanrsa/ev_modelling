@@ -168,7 +168,7 @@ class FlexEstimator:
 
         :param config: A yaml config file holding a dictionary with the keys 'pathRelative' and 'pathAbsolute'
         :return: Returns four dataframes: A path dictionary, scalars, drive profile data and plug profile
-        data, the latter three ones in a raw data format.
+                 data, the latter three ones in a raw data format.
         """
         print('Reading Venco input scalars, drive profiles and boolean plug profiles')
 
@@ -242,9 +242,9 @@ class FlexEstimator:
         Takes raw data as input and indices different profiles with the specified index columns und an unstacked form.
 
         :param driveProfiles_raw: Dataframe of raw drive profiles in km with as many index columns as elements
-            of the list in given in indices. One column represents one timestep, e.g. hour.
+               of the list in given in indices. One column represents one timestep, e.g. hour.
         :param plugProfiles_raw: Dataframe of raw plug profiles as boolean values with as many index columns
-            as elements of the list in given in indices. One column represents one timestep e.g. hour.
+               as elements of the list in given in indices. One column represents one timestep e.g. hour.
         :param indices: List of column names given as strings.
         :return: Two indexed dataframes with index columns as given in argument indices separated from data columns
         """
@@ -294,7 +294,7 @@ class FlexEstimator:
         :param driveProfiles: indexed profile file
         :param flexConfig: YAML config which holds all relative paths and filenames for flexEstimators.py
         :return: Returns a dataframe with consumption profiles in kWh/h in same format and length as driveProfiles but
-        scaled with the specific consumption assumption.
+                 scaled with the specific consumption assumption.
         """
 
         return driveProfiles * flexConfig['inputDataScalars']['Electric_consumption'] / float(100)
@@ -326,7 +326,7 @@ class FlexEstimator:
         :param scalarsProc: DataFrame holding information about profile length and number of hours.
         :param nIter: Number of iterations to assure that the minimum and maximum value are approximately the same
         :return: Returns an indexed DataFrame with the same length and form as chargProfiles and consumptionProfiles,
-        containing single-profile SOC max values for each hour in each profile.
+                 containing single-profile SOC max values for each hour in each profile.
         """
 
         chargeMaxProfiles = chargeProfiles.copy()
@@ -367,8 +367,8 @@ class FlexEstimator:
         :param chargeMaxProfiles: Dataframe holding timestep dependent SOC max values for each profile.
         :param scalarsProc: VencoPy Dataframe holding meta-information about read-in profiles.
         :return: Returns profiles for uncontrolled charging under the assumption that charging occurs as soon as a
-        vehicle is connected to the grid up to the point that the maximum battery SOC is reached or the connection
-        is interrupted. DataFrame has the same format as chargeMaxProfiles.
+                 vehicle is connected to the grid up to the point that the maximum battery SOC is reached or the
+                 connection is interrupted. DataFrame has the same format as chargeMaxProfiles.
         """
 
         chargeMaxProfiles = chargeMaxProfiles.copy()
@@ -391,7 +391,7 @@ class FlexEstimator:
                                  scalarsProc: pd.DataFrame) -> pd.DataFrame:
         # FixMe: alternative vectorized format for looping over columns? numpy, pandas: broadcasting-rules
         """
-         Calculates necessary fuel consumption profile of a potential auxilliary unit (e.g. a gasoline motor) based
+        Calculates necessary fuel consumption profile of a potential auxilliary unit (e.g. a gasoline motor) based
         on gasoline consumption given in scalar input data (in l/100 km). Auxilliary fuel is needed if an hourly
         mileage is higher than the available SoC Max in that hour.
 
@@ -401,7 +401,7 @@ class FlexEstimator:
         :param flexConfig: YAML config which holds all relative paths and filenames for flexEstimators.py
         :param scalarsProc: Dataframe holding meta-infos about the input
         :return: Returns a DataFrame with single-profile values for back-up fuel demand in the case a profile cannot
-        completely be fulfilled with electric driving under the given consumption and battery size assumptions.
+                 completely be fulfilled with electric driving under the given consumption and battery size assumptions.
         """
 
         # Future release:
@@ -437,13 +437,13 @@ class FlexEstimator:
 
         :param chargeProfiles: Charging profiles with techno-economic assumptions on connection power.
         :param consumptionProfiles: Profiles giving consumed electricity for each trip in each hour assuming specified
-            consumption.
+               consumption.
         :param driveProfilesFuelAux: Auxilliary fuel demand for fulfilling trips if purely electric driving doesn't suffice.
         :param scalarsProc: Number of profiles and number of hours of each profile.
         :param nIter: Gives the number of iterations to fulfill the boundary condition of the SoC equalling in the first
-            and in the last hour of the profile.
+               and in the last hour of the profile.
         :return: Returns an indexed DataFrame containing minimum SOC values for each profile in each hour in the same
-            format as chargeProfiles, consumptionProfiles and other input parameters.
+                 format as chargeProfiles, consumptionProfiles and other input parameters.
         """
         chargeMinProfiles = chargeProfiles.copy()
         batCapMin = self.flexConfig['inputDataScalars']['Battery_capacity'] * \
@@ -511,7 +511,7 @@ class FlexEstimator:
         :param driveProfiles: Dataframe holding hourly electricity consumption values in kWh/h for all profiles
         :param setSeed: Seed for reproducing stochasticity. Scalar number.
         :return: Returns an indexed series with the same indices as dirveProfiles with a random number between 0 and 1 for
-        each index.
+                 each index.
         """
 
         idxData = driveProfiles.copy()
@@ -542,10 +542,10 @@ class FlexEstimator:
         :param driveProfilesFuelAux: Indexed DataFrame giving auxiliary fuel demand.
         :param randNos: Indexed Series giving a random number between 0 and 1 for each profiles.
         :param fuelDriveTolerance: Give a threshold value how many liters may be needed throughout the course of a day
-        in order to still consider the profile.
+               in order to still consider the profile.
         :param isBEV: Boolean value. If true, more 2030 profiles are taken into account (in general).
         :return: The bool indices are written to one DataFrame in the DataManager with the columns randNo, indexCons and
-        indexDSM and the same indices as the other profiles.
+                 indexDSM and the same indices as the other profiles.
         """
 
         boolBEV = self.flexConfig['inputDataScalars']['Is_BEV?']
@@ -579,7 +579,7 @@ class FlexEstimator:
         :param filterCons: Dataframe containing one boolean filter value for each profile
         :param scalarsProc: Dataframe containing meta information of input profiles
         :param filterIndex: Can be either 'indexCons' or 'indexDSM' so far. 'indexDSM' applies stronger filters and results
-        are thus less representative.
+               are thus less representative.
         :return: Returns electric demand from driving filtered and aggregated to one fleet.
         """
 
@@ -677,7 +677,7 @@ class FlexEstimator:
         :param socMin: Minimum SOC profile subject to normalization
         :param socMax: Minimum SOC profile subject to normalization
         :param normReferenceParam: Reference parameter that is taken for normalization.
-        This has to be given in scalar input data and is most likely the 'Battery_capacity'.
+               This has to be given in scalar input data and is most likely the 'Battery_capacity'.
         :return: Writes the normalized profiles to the DataManager under the specified keys
         """
 
@@ -828,11 +828,11 @@ class FlexEstimator:
         :param by: index level to differentiate selections by. Given as a string.
         :param filter: Filter method given as a string. Currently only 'singleValue' is implemented
         :param alpha: Percentile value to filter out extreme minimum and maximum soc values. E.g. 10 selects the 90th
-        percentile for SOC max and the 10th percentile for SOC min values in each hour. These 24 values most likely do
-        not belong to the same profile.
+               percentile for SOC max and the 10th percentile for SOC min values in each hour. These 24 values most
+               likely do not belong to the same profile.
         :return: Returns a touple of estimated fleet socMin and socMax profiles for nHour x len(set(dataMin.loc[:, by])
-        values. E.g. if running for 24 hour profiles additionally differentiating weekdays, this yields 168 values per
-        resulting profile.
+                 values. E.g. if running for 24 hour profiles additionally differentiating weekdays, this yields 168
+                 values per resulting profile.
         """
         # socSelectionPartial = functools.partial(func=self.socProfileSelection, filter=filter, alpha=alpha)
         vars = set(dataMin.index.get_level_values(by))
@@ -865,7 +865,7 @@ class FlexEstimator:
         :param flexConfig: YAML config which holds all relative paths and filenames for flexEstimators.py
         :param profile: Dataframe of profile that should be corrected
         :param profType: A list of strings specifying if the given profile type is an electric or a fuel profile.
-        profType has to have the same length as profiles.
+               profType has to have the same length as profiles.
         :return:
         """
 

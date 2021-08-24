@@ -257,7 +257,7 @@ class TripDiaryBuilder:
 
         :param tripData: data frame holding all the information about individual trip
         :param purposeDataDays: DataFrame with 24 (hour) columns holding 0s and 'DRIVING' for trip hours (for hours
-        where majority of time is driving)
+               where majority of time is driving)
         :return: Returns a data frame of individual trip with it's hourly activity or parking purpose
         """
         hpID = str()
