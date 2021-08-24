@@ -26,7 +26,7 @@ author = 'Niklas Wulff'
 contributors = 'Fabia Miorelli, Benjamin Fuchs'
 
 # The full version, including alpha/beta/rc tags
-release = 'March 2020'
+release = 'September 2021'
 
 
 # -- General configuration ---------------------------------------------------
