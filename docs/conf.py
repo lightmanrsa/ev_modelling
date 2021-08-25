@@ -38,8 +38,7 @@ highlight_language = 'python3'
 extensions = ['sphinx.ext.autodoc',
               'sphinx_rtd_theme',
               'sphinx.ext.napoleon',
-              'sphinx.ext.autosectionlabel',
-              'myst_parser']
+              'sphinx.ext.autosectionlabel']
 
 source_suffix = {
     '.rst': 'restructuredtext',
