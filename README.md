@@ -1,5 +1,6 @@
 [![License: BSD 3-Clause](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)](https://github.com/TechSmith/hyde/blob/master/LICENSE.txt)
 [![Documentation Status](https://readthedocs.org/projects/vencopy/badge/?version=latest)](https://vencopy.readthedocs.io/en/latest/?badge=latest)
+[![PyPI version](https://badge.fury.io/py/vencopy.svg)](https://badge.fury.io/py/vencopy)
 
 
 # VencoPy README File
@@ -14,6 +15,7 @@ Contents
  * [Installation](#installation)
  * [Codestyle](#codestyle)
  * [Documentation](#documentation)
+ * [Useful Links](#useful-links)
  * [Want to contribute?](#want-to-contribute)
 
 Description
@@ -94,13 +96,25 @@ We use PEP-8, with the exception of lowerCamelCase for method and variable names
 
 Documentation
 ---
-To build the documentation from a conda bash with an activated environment type:
+The documentation can be found here: https://vencopy.readthedocs.io/en/latest/index.html#
+
+
+
+To build the documentation locally type from a conda bash with an activated environment:
 
 ```python
 sphinx-build -b html ./docs/ ./build/
 ``` 
 
+Useful Links
+---
+
+* Documentation: https://vencopy.readthedocs.io/en/latest/index.html#
+* Source code: https://gitlab.com/dlr-ve/vencopy
+* PyPI release: https://pypi.org/project/vencopy
+
+
 Want to contribute?
 ---
-Great, welcome on the VP team! Please read our contribute section in the documentation and reach out to Niklas 
+Great, welcome on the VencoPy team! Please read our contribute section in the documentation and reach out to Niklas 
 (niklas.wulff@dlr.de). 
