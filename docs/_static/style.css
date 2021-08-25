@@ -1,8 +1,8 @@
+
 p {
 text-align: justify;
 text-justify: inter-word;
 }
-
 
 @media screen and (min-width: 767px) {
     .wy-table-responsive table td {

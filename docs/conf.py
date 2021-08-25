@@ -18,13 +18,12 @@ sys.path.append(os.path.abspath('..'))
 sys.path.append(os.path.abspath('../scripts'))
 sys.path.append(os.path.abspath('../classes'))
 
-
 # -- Project information -----------------------------------------------------
 
 project = 'VencoPy'
 copyright = '2020-2021, German Aerospace Center (DLR)'
 author = 'German Aerospace Center (DLR)'
-#contributors = 'Fabia Miorelli, Benjamin Fuchs'
+# contributors = 'Fabia Miorelli, Benjamin Fuchs'
 
 # The full version, including alpha/beta/rc tags
 release = 'September 2021'
@@ -39,8 +38,14 @@ highlight_language = 'python3'
 extensions = ['sphinx.ext.autodoc',
               'sphinx_rtd_theme',
               'sphinx.ext.napoleon',
-              'sphinx.ext.autosectionlabel']
+              'sphinx.ext.autosectionlabel',
+              'myst_parser']
 
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
