@@ -365,8 +365,8 @@ class FlexEstimator:
         :param chargeMaxProfiles: Dataframe holding timestep dependent SOC max values for each profile.
         :param scalarsProc: VencoPy Dataframe holding meta-information about read-in profiles.
         :return: Returns profiles for uncontrolled charging under the assumption that charging occurs as soon as a
-                 vehicle is connected to the grid up to the point that the maximum battery SOC is reached or the connection
-                 is interrupted. DataFrame has the same format as chargeMaxProfiles.
+                 vehicle is connected to the grid up to the point that the maximum battery SOC is reached or the
+                 connection is interrupted. DataFrame has the same format as chargeMaxProfiles.
         """
 
         chargeMaxProfiles = chargeMaxProfiles.copy()
@@ -827,7 +827,7 @@ class FlexEstimator:
         :param alpha: Percentile value to filter out extreme minimum and maximum soc values. E.g. 10 selects the 90th
                percentile for SOC max and the 10th percentile for SOC min values in each hour. These 24 values most
                likely do not belong to the same profile.
-        :return: Returns a tuple of estimated fleet socMin and socMax profiles for nHour x len(set(dataMin.loc[:, by])
+        :return: Returns a touple of estimated fleet socMin and socMax profiles for nHour x len(set(dataMin.loc[:, by])
                  values. E.g. if running for 24 hour profiles additionally differentiating weekdays, this yields 168
                  values per resulting profile.
         """
