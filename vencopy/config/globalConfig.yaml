@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 
-# __version__ = '0.1.0'
+# __version__ = '0.1.3'
 # __maintainer__ = 'Niklas Wulff'
 # __contributors__ = 'Fabia Miorelli, Parth Butte'
 # __email__ = 'niklas.wulff@dlr.de'
@@ -10,12 +10,12 @@
 # This config holds all relative paths and filenames for VencoPy
 
 pathRelative:
-    plots: ./output/evaluator/
-    parseOutput: ./output/dataParser/
-    diaryOutput: ./output/tripDiaryBuilder/
-    gridOutput: ./output/gridModeler/
-    flexOutput: ./output/flexEstimator/
-    evalOutput: ./output/evaluator/
+    plots: ../output/evaluator/
+    parseOutput: ../output/dataParser/
+    diaryOutput: ../output/tripDiaryBuilder/
+    gridOutput: ../output/gridModeler/
+    flexOutput: ../output/flexEstimator/
+    evalOutput: ../output/evaluator/
     scripts: ./scripts/
     config: ./config/
 
@@ -34,6 +34,7 @@ files:
         inputDataDriveProfiles: inputProfiles_Drive  # inputProfiles_Drive_RUNLABEL_MiD17.csv
         inputDataPlugProfiles: inputProfiles_Plug  # inputProfiles_Plug_RUNLABEL_MiD17.csv
         output: vencopy
+        vencoPyOutput: vencoPyOutput
         flexPlotName: flexProfileComparison
     MiD08:
         householdsDataRaw: MiD2008_PUF_Haushalte.dta
@@ -46,7 +47,19 @@ files:
         inputDataPlugProfiles: inputProfiles_Plug  # inputProfiles_Plug_RUNLABEL_MiD08.csv
         output: vencopy
         flexPlotName: flexProfileComparison
+    KiD:
+        tripsDataRaw: KiD2010-Fahrten-Datei-puf.dta
+        vehiclesDataRaw: KiD2010-Fahrzeug-Datei-puf.dta
+        # tripsDataRaw: KiD2010_merged.dta
+        tripsProcessedOld:
+        purposesProcessedOld:
+        purposesProcessed:
+        inputDataDriveProfiles:
+        inputDataPlugProfiles:
+        vencoPyOutput:
+        flexPlotName:
     output: output
+    vencoPyOutput: vencoPyOutput
     aggPlotName: mobilityComparison
     flexPlotName: flexProfileComparison
 

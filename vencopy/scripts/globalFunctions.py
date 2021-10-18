@@ -1,4 +1,4 @@
-__version__ = '0.1.0'
+__version__ = '0.1.3'
 __maintainer__ = 'Niklas Wulff'
 __contributors__ = 'Fabia Miorelli, Parth Butte'
 __email__ = 'niklas.wulff@dlr.de'
@@ -8,7 +8,24 @@ __license__ = 'BSD-3-Clause'
 
 import pandas as pd
 import yaml
-import pathlib
+from pathlib import Path
+
+
+def loadConfigDict(configNames: tuple):
+    # pathLib syntax for windows, max, linux compatibility, see https://realpython.com/python-pathlib/ for an intro
+    """
+    Generic function to load and open yaml config files
+
+    :param configNames: Tuple containing names of config files to be loaded
+    :return: Dictionary with opened yaml config files
+    """
+    basePath = Path(__file__).parent.parent / 'config'
+    configDict = {}
+    for configName in configNames:
+        filePath = (basePath / configName).with_suffix('.yaml')
+        with open(filePath) as ipf:
+            configDict[configName] = yaml.load(ipf, Loader=yaml.SafeLoader)
+    return configDict
 
 
 def createFileString(globalConfig: dict, fileKey: str, datasetID: str=None, manualLabel: str = '',
@@ -40,11 +57,11 @@ def mergeVariables(data, variableData, variables):
     :return: The merged data
     """
 
-    variableDataUnique = variableData.loc[~variableData['hhPersonID'].duplicated(), :]
-    variables.append('hhPersonID')
-    variableDataMerge = variableDataUnique.loc[:, variables].set_index('hhPersonID')
-    if 'hhPersonID' not in data.index.names:
-        data.set_index('hhPersonID', inplace=True, drop=True)
+    variableDataUnique = variableData.loc[~variableData['genericID'].duplicated(), :]
+    variables.append('genericID')
+    variableDataMerge = variableDataUnique.loc[:, variables].set_index('genericID')
+    if 'genericID' not in data.index.names:
+        data.set_index('genericID', inplace=True, drop=True)
     mergedData = pd.concat([variableDataMerge, data], axis=1, join='inner')
     mergedData.reset_index(inplace=True)
     return mergedData
@@ -64,20 +81,20 @@ def writeProfilesToCSV(profileDictOut, globalConfig: dict, singleFile=True, data
 
     :param outputFolder: path to output folder
     :param profileDictOut: Dictionary with profile names in keys and profiles as pd.Series containing a VencoPy
-    profile each to be written in value
+           profile each to be written in value
     :param singleFile: If True, all profiles will be appended and written to one .csv file. If False, five files are
-    written
+           written
     :param strAdd: String addition for filenames
     :return: None
     """
 
     if singleFile:
         dataOut = pd.DataFrame(profileDictOut)
-        dataOut.to_csv(pathlib.Path(globalConfig['pathRelative']['flexOutput']) /
+        dataOut.to_csv(Path(__file__).parent / globalConfig['pathRelative']['flexOutput'] /
                        createFileString(globalConfig=globalConfig, fileKey='output',
                                         manualLabel=globalConfig['labels']['technologyLabel'], datasetID=datasetID),
                        header=True)
     else:
         for iName, iProf in profileDictOut.items():
-            iProf.to_csv(pathlib.Path(globalConfig['pathRelative']['flexOutput']) /
-                         pathlib.Path(f'vencopy_{iName}_{datasetID}.csv'), header=True)
+            iProf.to_csv(Path(__file__).parent / globalConfig['pathRelative']['flexOutput'] /
+                         Path(f'vencopy_{iName}_{datasetID}.csv'), header=True)
